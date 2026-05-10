@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة نتائج الفترة الثانية – الثالث متوسط | مجمع الصديق</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: rgba(255,255,255,0.07);
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --gold: #f59e0b;
+    --excellent: #10b981;
+    --vgood: #3b82f6;
+    --good: #f59e0b;
+    --weak: #ef4444;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --radius: 16px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background pattern */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(6,182,212,0.06) 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 28px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  .sidebar-logo .logo-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 14px;
+    display: flex; align-items:center; justify-content:center;
+    font-size: 24px;
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+  }
+  .sidebar-logo h2 {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .sidebar-logo p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .nav-section {
+    padding: 20px 12px;
+    flex: 1;
+  }
+  .nav-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    border: 1px solid transparent;
+    text-decoration: none;
+  }
+  .nav-item:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.1));
+    border-color: rgba(59,130,246,0.3);
+    color: var(--accent);
+  }
+  .nav-item .icon { font-size: 18px; }
+
+  /* ===== MAIN ===== */
+  .main {
+    margin-right: 240px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .topbar {
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(17,24,39,0.8);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar h1 {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .topbar-badge {
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+
+  .page { display: none; padding: 28px 32px; animation: fadeIn 0.35s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* ===== STATS CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .stat-card::before {
+    content:'';
+    position:absolute;
+    top:0; right:0;
+    width:80px; height:80px;
+    border-radius: 0 0 0 100%;
+    opacity: 0.15;
+  }
+  .stat-card.blue::before { background: var(--accent); }
+  .stat-card.cyan::before { background: var(--accent2); }
+  .stat-card.gold::before { background: var(--gold); }
+  .stat-card.green::before { background: var(--excellent); }
+
+  .stat-icon { font-size: 28px; margin-bottom: 12px; }
+  .stat-value {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card.blue .stat-value { color: var(--accent); }
+  .stat-card.cyan .stat-value { color: var(--accent2); }
+  .stat-card.gold .stat-value { color: var(--gold); }
+  .stat-card.green .stat-value { color: var(--excellent); }
+  .stat-label { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+  /* ===== CHARTS ROW ===== */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .chart-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Bar chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; }
+  .bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; }
+  .bar-col { width:100%; background:var(--surface2); border-radius:6px; position:relative; overflow:hidden; flex:1; }
+  .bar-fill {
+    position:absolute; bottom:0; left:0; right:0;
+    border-radius:6px;
+    transition: height 1s cubic-bezier(.34,1.56,.64,1);
+  }
+  .bar-label { font-size:11px; color:var(--muted); }
+  .bar-val { font-size:12px; font-weight:700; }
+
+  /* Donut */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg { width:130px; height:130px; flex-shrink:0; }
+  .donut-legend { display:flex; flex-direction:column; gap:10px; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:13px; }
+  .legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+  .legend-label { color:var(--muted); }
+  .legend-val { font-weight:700; margin-right:auto; }
+
+  /* ===== TABLE ===== */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-header h3 { font-size:16px; font-weight:700; }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    width: 160px;
+  }
+  .search-box input::placeholder { color: var(--muted); }
+
+  table { width:100%; border-collapse:collapse; }
+  thead th {
+    background: rgba(255,255,255,0.03);
+    padding: 12px 22px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: right;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  td {
+    padding: 12px 22px;
+    font-size: 13.5px;
+    vertical-align: middle;
+  }
+
+  .rank-num {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--muted);
+    width: 30px;
+    text-align: center;
+  }
+  .rank-num.top3 { color: var(--gold); }
+
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .badge-excellent { background:rgba(16,185,129,0.15); color:var(--excellent); border:1px solid rgba(16,185,129,0.3); }
+  .badge-vgood    { background:rgba(59,130,246,0.15); color:var(--vgood); border:1px solid rgba(59,130,246,0.3); }
+  .badge-good     { background:rgba(245,158,11,0.15); color:var(--good); border:1px solid rgba(245,158,11,0.3); }
+  .badge-weak     { background:rgba(239,68,68,0.15); color:var(--weak); border:1px solid rgba(239,68,68,0.3); }
+
+  .level-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .pill-excellent { background:rgba(16,185,129,0.1); color:var(--excellent); }
+  .pill-vgood    { background:rgba(59,130,246,0.1); color:var(--vgood); }
+  .pill-good     { background:rgba(245,158,11,0.1); color:var(--good); }
+  .pill-weak     { background:rgba(239,68,68,0.1); color:var(--weak); }
+
+  /* Progress bar */
+  .prog-bar { height:6px; background:var(--surface2); border-radius:3px; width:80px; overflow:hidden; }
+  .prog-fill { height:100%; border-radius:3px; }
+
+  /* ===== CLASS TABS ===== */
+  .class-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .class-tab {
+    padding: 10px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .class-tab:hover { border-color: var(--accent); color:var(--text); }
+  .class-tab.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+  }
+
+  /* ===== PROFILE PAGE ===== */
+  .profile-card {
+    max-width: 500px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px;
+    text-align: center;
+  }
+  .avatar {
+    width: 88px; height: 88px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    display: flex; align-items:center; justify-content:center;
+    font-size: 36px;
+    margin: 0 auto 18px;
+    box-shadow: 0 8px 28px rgba(59,130,246,0.4);
+  }
+  .profile-name {
+    font-family:'Tajawal',sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .profile-role {
+    font-size:13px; color:var(--muted); margin-bottom: 28px;
+  }
+  .profile-info { text-align:right; }
+  .info-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .lbl { color:var(--muted); }
+  .info-row .val { font-weight:700; }
+
+  /* ===== RECOMMENDATIONS PAGE ===== */
+  .rec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .rec-card h3 {
+    font-size: 15px; font-weight: 700;
+    margin-bottom: 14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .rec-card ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .rec-card ul li {
+    font-size: 13.5px; color:var(--muted);
+    display:flex; align-items:flex-start; gap:8px; line-height:1.6;
+  }
+  .rec-card ul li::before { content:'←'; color:var(--accent); flex-shrink:0; margin-top:1px; }
+
+  .full-rec { grid-column: 1/-1; }
+
+  /* Horizontal bar chart for classes comparison */
+  .h-bars { display:flex; flex-direction:column; gap:12px; }
+  .h-bar-row { display:flex; align-items:center; gap:12px; font-size:13px; }
+  .h-bar-label { width:60px; color:var(--muted); text-align:right; font-weight:600; }
+  .h-bar-track { flex:1; background:var(--surface2); border-radius:4px; height:10px; overflow:hidden; }
+  .h-bar-fill { height:100%; border-radius:4px; }
+  .h-bar-val { width:40px; font-weight:700; font-size:13px; }
+
+  /* ===== Overview home page ===== */
+  .section-title {
+    font-family:'Tajawal',sans-serif;
+    font-size:18px; font-weight:800;
+    margin-bottom: 16px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-title::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* Responsive for chart donut */
+  .overview-bottom {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+  }
+
+  /* Mini stat row */
+  .mini-stats { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+  .mini-stat {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 16px;
+    display:flex; align-items:center; gap:8px;
+    font-size:13px;
+  }
+  .mini-stat .ms-val { font-weight:800; font-size:16px; }
+
+  /* ===== Footer ===== */
+  .footer { padding: 20px 32px; color:var(--muted); font-size:12px; border-top:1px solid var(--border); margin-top:16px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+
+  /* Table scroll */
+  .table-scroll { max-height: 460px; overflow-y:auto; }
+
+  /* Animate bars on load */
+  @keyframes barRise { from { height:0 !important; } }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏫</div>
+    <h2>مجمع الصديق المتوسط</h2>
+    <p>الفصل الدراسي الثاني</p>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">القوائم الرئيسية</div>
+    <a class="nav-item active" onclick="showPage('overview')">
+      <span class="icon">📊</span> الفصول
+    </a>
+    <a class="nav-item" onclick="showPage('students')">
+      <span class="icon">👥</span> الطلاب
+    </a>
+    <a class="nav-item" onclick="showPage('profile')">
+      <span class="icon">👤</span> بياناتي الشخصية
+    </a>
+    <a class="nav-item" onclick="showPage('recommendations')">
+      <span class="icon">💡</span> التوصيات
+    </a>
+  </div>
+  <div style="padding:0 12px 16px;">
+    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px;font-size:12px;">
+      <div style="color:var(--gold);font-weight:700;margin-bottom:4px;">📅 الفترة الثانية</div>
+      <div style="color:var(--muted);">الثالث متوسط | العام الدراسي 1446</div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">📊 لوحة الفصول</h1>
+    <div class="topbar-badge">اختبار الفترة الثانية</div>
+  </div>
+
+  <!-- ====== PAGE: OVERVIEW (Classes) ====== -->
+  <div class="page active" id="page-overview">
+    <div class="class-tabs">
+      <div class="class-tab active" onclick="switchClass(1, this)">الفصل 1-3</div>
+      <div class="class-tab" onclick="switchClass(2, this)">الفصل 2-3</div>
+      <div class="class-tab" onclick="switchClass(3, this)">الفصل 3-3</div>
+      <div class="class-tab" onclick="switchClass(4, this)">الفصل 4-3</div>
+    </div>
+
+    <div id="classContent"></div>
+  </div>
+
+  <!-- ====== PAGE: STUDENTS (All) ====== -->
+  <div class="page" id="page-students">
+    <div class="section-title">جميع الطلاب</div>
+    <div class="mini-stats">
+      <div class="mini-stat"><span>👨‍🎓</span><span class="ms-val">116</span><span style="color:var(--muted)">إجمالي الطلاب</span></div>
+      <div class="mini-stat"><span style="color:var(--excellent)">⭐</span><span class="ms-val" style="color:var(--excellent)">73</span><span style="color:var(--muted)">ممتاز (18-20)</span></div>
+      <div class="mini-stat"><span style="color:var(--vgood)">🔵</span><span class="ms-val" style="color:var(--vgood)">22</span><span style="color:var(--muted)">جيد جداً (15-17)</span></div>
+      <div class="mini-stat"><span style="color:var(--good)">🟡</span><span class="ms-val" style="color:var(--good)">14</span><span style="color:var(--muted)">جيد (12-14)</span></div>
+      <div class="mini-stat"><span style="color:var(--weak)">🔴</span><span class="ms-val" style="color:var(--weak)">7</span><span style="color:var(--muted)">ضعيف (&lt;12)</span></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">
+        <h3>ترتيب جميع الطلاب</h3>
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="ابحث عن طالب..." id="globalSearch" oninput="filterGlobal()">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>الترتيب</th>
+              <th>اسم الطالب</th>
+              <th>الفصل</th>
+              <th>الدرجة</th>
+              <th>المستوى</th>
+              <th>التقدم</th>
+            </tr>
+          </thead>
+          <tbody id="globalTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PAGE: PROFILE ====== -->
+  <div class="page" id="page-profile">
+    <div class="section-title">البيانات الشخصية</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+      <div class="profile-card">
+        <div class="avatar">🏫</div>
+        <div class="profile-name">مجمع الصديق المتوسط</div>
+        <div class="profile-role">لوحة نتائج الفترة الدراسية الثانية</div>
+        <div class="profile-info">
+          <div class="info-row"><span class="lbl">المرحلة الدراسية</span><span class="val">الثالث متوسط</span></div>
+          <div class="info-row"><span class="lbl">عدد الفصول</span><span class="val">4 فصول</span></div>
+          <div class="info-row"><span class="lbl">إجمالي الطلاب</span><span class="val">116 طالب</span></div>
+          <div class="info-row"><span class="lbl">الاختبار</span><span class="val">الفترة الثانية</span></div>
+          <div class="info-row"><span class="lbl">الدرجة العظمى</span><span class="val">20 درجة</span></div>
+          <div class="info-row"><span class="lbl">أعلى درجة</span><span class="val" style="color:var(--excellent)">20 / 20</span></div>
+          <div class="info-row"><span class="lbl">أدنى درجة</span><span class="val" style="color:var(--weak)">8 / 20</span></div>
+          <div class="info-row"><span class="lbl">المتوسط العام</span><span class="val" id="profileAvg">–</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="chart-card">
+          <div class="chart-title">🏆 مقارنة متوسطات الفصول</div>
+          <div class="h-bars" id="classCompare"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">📋 ملخص المستويات الكلي</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 36 36" id="globalDonut"></svg>
+            <div class="donut-legend" id="globalLegend"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PAGE: RECOMMENDATIONS ====== -->
+  <div class="page" id="page-recommendations">
+    <div class="section-title">التوصيات والتحليل</div>
+    <div class="rec-grid">
+      <div class="rec-card">
+        <h3><span>🌟</span> توصيات للطلاب المتميزين</h3>
+        <ul>
+          <li>تشجيع الطلاب الحاصلين على 20/20 على المشاركة في المسابقات العلمية والأولمبياد.</li>
+          <li>منحهم أدواراً قيادية داخل الفصل كمرشدين أكاديميين لزملائهم.</li>
+          <li>إشراكهم في مشاريع بحثية وتطويرية تنمّي قدراتهم.</li>
+          <li>تقديم شهادات تقدير وتحفيز لمواصلة التميز.</li>
+        </ul>
+      </div>
+      <div class="rec-card">
+        <h3><span>📈</span> توصيات للطلاب الجيدين</h3>
+        <ul>
+          <li>توفير جلسات تدريبية إضافية لرفع مستوى الأداء إلى الممتاز.</li>
+          <li>تحديد نقاط الضعف الجزئية ومعالجتها بخطط تحسين فردية.</li>
+          <li>استخدام أسلوب التعلم التعاوني مع الطلاب المتفوقين.</li>
+          <li>مراجعة دورية أسبوعية للمفاهيم الأساسية.</li>
+        </ul>
+      </div>
+      <div class="rec-card">
+        <h3><span>⚠️</span> توصيات للطلاب الضعيفين</h3>
+        <ul>
+          <li>إجراء اختبارات تشخيصية لتحديد الثغرات التعليمية بدقة.</li>
+          <li>تصميم خطط علاجية فردية لكل طالب.</li>
+          <li>التواصل المستمر مع أولياء الأمور لتعزيز المتابعة المنزلية.</li>
+          <li>توفير دروس تعويضية وتقليل حجم الواجبات المعقدة مؤقتاً.</li>
+          <li>استخدام الوسائل التعليمية المتنوعة (فيديو، تطبيقات) لرفع الدافعية.</li>
+        </ul>
+      </div>
+      <div class="rec-card">
+        <h3><span>🏫</span> توصيات لإدارة المدرسة</h3>
+        <ul>
+          <li>مراجعة توزيع الطلاب على الفصول لضمان التوازن في المستويات.</li>
+          <li>عقد اجتماعات دورية بين المعلمين لتبادل الاستراتيجيات الناجحة.</li>
+          <li>تفعيل برامج الإرشاد الأكاديمي للطلاب المتأخرين دراسياً.</li>
+          <li>الاستثمار في التدريب المهني للمعلمين على أساليب التدريس الحديثة.</li>
+        </ul>
+      </div>
+      <div class="rec-card full-rec">
+        <h3><span>📊</span> ملاحظات تحليلية عامة</h3>
+        <ul>
+          <li>نسبة النجاح الكلية مرتفعة جداً مما يعكس جودة التدريس ومستوى الطلاب.</li>
+          <li>الفصول الأربعة تتقارب في المتوسطات العامة مما يدل على تجانس مستوى التدريس.</li>
+          <li>وجود عدد من الطلاب الحاصلين على الدرجة الكاملة 20/20 في جميع الفصول.</li>
+          <li>يُنصح بمراجعة أسلوب تقييم الطلاب الضعيفين للتأكد من أن ضعف درجاتهم لا يعكس صعوبات تعلم غير مشخّصة.</li>
+          <li>تشير البيانات إلى أن الغالبية العظمى من الطلاب (63%) حصلوا على مستوى ممتاز، مما يستوجب الحفاظ على هذا المعدل في الفترة القادمة.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">مجمع الصديق المتوسط · الفترة الثانية · الثالث متوسط · 1446 هـ</div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const rawData = [
+  {id:1,name:"مشعل احمد عمر ابوشانين",score:12,cls:4},
+  {id:2,name:"مالك موسى عالي الشمراني",score:11,cls:3},
+  {id:3,name:"مهند عمار عبدالله اسماعيل",score:19,cls:2},
+  {id:4,name:"بدر عبدالله احمد الجدعاني",score:17,cls:3},
+  {id:5,name:"عبدالله محمد عبدالله احمد",score:13,cls:1},
+  {id:6,name:"راجح محمد عبدالله احمد",score:14,cls:1},
+  {id:7,name:"عبدالرحمن محمد الدواسي",score:20,cls:2},
+  {id:8,name:"وليد عبدالمجيد محمد الصومعي",score:20,cls:1},
+  {id:9,name:"علي أحمد علي حسين",score:19,cls:2},
+  {id:10,name:"سعود محمد نور عبد المطلب",score:20,cls:2},
+  {id:11,name:"احمد ماجد احمد محمد",score:19,cls:1},
+  {id:12,name:"امجد محمد",score:20,cls:1},
+  {id:13,name:"محمد ياسر عوض الرشيدي",score:18,cls:2},
+  {id:14,name:"الحسن عبدالله مهيوب",score:19,cls:4},
+  {id:15,name:"وسام مصطفى احمد قاهو",score:12,cls:2},
+  {id:16,name:"يوسف شعبان داود حسن",score:20,cls:4},
+  {id:17,name:"محمد سليمان حسين طاهر",score:18,cls:2},
+  {id:18,name:"بشار عبد العزيز محمد سيف فرج",score:20,cls:3},
+  {id:19,name:"صالح مصلح عبداالله",score:20,cls:4},
+  {id:20,name:"عبدالله عمار محمد ناصر",score:20,cls:1},
+  {id:21,name:"كرم أبو بكر قاسم غانم الاحمدي",score:20,cls:4},
+  {id:22,name:"همام صالح عبدالله محمد اليافعي",score:20,cls:4},
+  {id:23,name:"فهد محمد السناني",score:17,cls:2},
+  {id:24,name:"ادم عبد الرحمن صالح عبد الرحمن",score:20,cls:2},
+  {id:25,name:"طلال وضاح حسن",score:14,cls:1},
+  {id:26,name:"أسامه خضير الهزازي",score:20,cls:2},
+  {id:27,name:"سالم عبدالله سالم زبيدي",score:18,cls:1},
+  {id:28,name:"ادم عبد الرحمن صالح",score:20,cls:2},
+  {id:29,name:"هاشم احمد محسن عبد الرب السعدي اليافعي",score:19,cls:1},
+  {id:30,name:"عبده أحمد محمد جمالي",score:19,cls:2},
+  {id:31,name:"حمزة سيف سالم احمد",score:20,cls:2},
+  {id:32,name:"فيصل عبدالله حسن دغريري",score:14,cls:3},
+  {id:33,name:"حسن محمد مصطفى إبراهيم",score:17,cls:1},
+  {id:34,name:"نايف علي محمد خضر",score:20,cls:2},
+  {id:35,name:"نادر محمد مبارك الحداد",score:20,cls:4},
+  {id:36,name:"زياد يوسف علي محمد",score:19,cls:2},
+  {id:37,name:"سامر حسن سعيد البيشي",score:14,cls:1},
+  {id:38,name:"زيد عمار عابدين بخيت",score:14,cls:1},
+  {id:39,name:"محمد جاويد اقبال علي",score:20,cls:3},
+  {id:40,name:"مهند محمد يونس بديع الرحمن",score:10,cls:3},
+  {id:41,name:"عبد البصير سمي علي حيدر",score:8,cls:2},
+  {id:42,name:"عبداالله عبدالله حسن القرشي",score:20,cls:2},
+  {id:43,name:"سالم يوسف احمد مجاعش",score:20,cls:2},
+  {id:44,name:"همام صالح عبدالله محمد اليافعي",score:19,cls:4},
+  {id:45,name:"محمد علي أميدو محمد",score:20,cls:2},
+  {id:46,name:"مسعود سيد نور محمد",score:19,cls:3},
+  {id:47,name:"مساعد احمد عقيل الجوفي",score:20,cls:3},
+  {id:48,name:"ناصر عوض احمد عوض قاسم الهلالي",score:20,cls:4},
+  {id:49,name:"عبدالله علي عبدالله خيرالله",score:20,cls:2},
+  {id:50,name:"أنس جمال الدين توران علي",score:19,cls:1},
+  {id:51,name:"عمار علي صالح",score:19,cls:4},
+  {id:52,name:"عبدالرحمن محمد عبدالرحمن",score:10,cls:3},
+  {id:53,name:"حسين بو حسين الحصا",score:18,cls:3},
+  {id:54,name:"محمد احمد بصير",score:18,cls:2},
+  {id:55,name:"عبدالمحسن علي أميدو محمد",score:15,cls:1},
+  {id:56,name:"حمدان رائد احمد الحصا",score:16,cls:4},
+  {id:57,name:"عبدالله علي عوض سلع",score:9,cls:1},
+  {id:58,name:"عزام عمر علي المسعود عيسى",score:18,cls:1},
+  {id:59,name:"خالد عمر برج عمر البيني",score:18,cls:2},
+  {id:60,name:"خبائر نورئي حسن قاحسين قاردر حسين",score:10,cls:3},
+  {id:61,name:"عبدالسلام الجالمل علي الماح",score:19,cls:1},
+  {id:62,name:"عبدالسلام الجالمل علي الماح",score:20,cls:1},
+  {id:63,name:"وسيم مساتيني فيصل قبيصي",score:10,cls:3},
+  {id:64,name:"ضياء يحيى الغيثي",score:20,cls:2},
+  {id:65,name:"اكرم سيد كلمتوم محمد",score:18,cls:2},
+  {id:66,name:"نادر محمد الحداد",score:20,cls:4},
+  {id:67,name:"عماد محسن احمد حسن السعدي",score:18,cls:3},
+  {id:68,name:"ريان قاصر احمد",score:13,cls:4},
+  {id:69,name:"ماهر جومهر محمد",score:10,cls:3},
+  {id:70,name:"محمد احمد محي الدين",score:11,cls:4},
+  {id:71,name:"رانيد مطهر علي القديمي",score:8,cls:3},
+  {id:72,name:"محمد سامي",score:16,cls:1},
+  {id:73,name:"مهند ابكر يعقوب ادريس",score:11,cls:2},
+  {id:74,name:"مؤيد مصطفى عبدالرحمن محمد",score:20,cls:4},
+  {id:75,name:"مسعد زاهماد حسين القحكيم",score:20,cls:4},
+  {id:76,name:"خالد برج عبدالله فعيش",score:12,cls:1},
+  {id:77,name:"محمد رضوان الغاردي",score:20,cls:1},
+  {id:78,name:"عمار يوسف رس في",score:13,cls:1},
+  {id:79,name:"محمد طه حسين الحصا",score:15,cls:1},
+  {id:80,name:"لؤي عبدالله الأهده",score:20,cls:3},
+  {id:81,name:"عمر سامي احمد ادريس",score:19,cls:2},
+  {id:82,name:"نايف عبدالعزيز يزعقا سمق",score:17,cls:4},
+  {id:83,name:"انس محمد سليمي",score:17,cls:1},
+  {id:84,name:"محمد جاعم الحصا دلهش",score:20,cls:3},
+  {id:85,name:"قاهد عبدالرحمن حسن فاشعين",score:20,cls:3},
+  {id:86,name:"عبدالرحمن محمد عبدالرحمن سينيا",score:8,cls:3},
+  {id:87,name:"ماهر بخيت سعيد الشمراني",score:20,cls:4},
+  {id:88,name:"ابراهيم مسلم علي بشر",score:20,cls:1},
+  {id:89,name:"رامي احمد عبد القوي",score:20,cls:4},
+  {id:90,name:"حسن عثمان محمد الحصا",score:20,cls:3},
+  {id:91,name:"محمد جبريل صايل حملح",score:20,cls:4},
+  {id:92,name:"أحمد أحمد محمد احمد مساحل",score:20,cls:2},
+  {id:93,name:"تركي بكر عبد الحكيم احمد",score:20,cls:2},
+  {id:94,name:"انس صالح حقاسم",score:20,cls:3},
+  {id:95,name:"عبدالرحمن محمد",score:20,cls:2},
+  {id:96,name:"حسب الله ادريس هيضف",score:11,cls:1},
+  {id:97,name:"حسب الله ادريس هيضف",score:11,cls:1},
+  {id:98,name:"وسيم عمر ابراهيم مسئومه",score:18,cls:3},
+  {id:99,name:"محمد سعيد الرافعيا",score:20,cls:4},
+  {id:100,name:"عدي علي حميد عبده",score:16,cls:3},
+  {id:101,name:"ياسر سرعرف تاع سمقا",score:20,cls:4},
+  {id:102,name:"محمد عبده فتح الجال",score:20,cls:1},
+  {id:103,name:"عبدالله علي مختار",score:16,cls:3},
+  {id:104,name:"ابراهيم همشا محمد",score:18,cls:1},
+  {id:105,name:"عيسى محمد ادريس عيسى",score:15,cls:3},
+  {id:106,name:"ابراهيم محمد نور محمد زمين",score:18,cls:3},
+  {id:107,name:"عبدالعزيز يزيب مجاهد علي القاضي",score:20,cls:1},
+  {id:108,name:"محمد ابراهيم أبو بكر",score:6,cls:3},
+  {id:109,name:"حسين حسيان مهشا",score:20,cls:1},
+  {id:110,name:"محمد طه حسين الحصا",score:20,cls:1},
+  {id:111,name:"احمد انور اشعار",score:20,cls:2},
+  {id:112,name:"شعيب نورها",score:13,cls:3},
+  {id:113,name:"يزن ابراهيم النور",score:10,cls:4},
+  {id:114,name:"محمد احمد بصير",score:19,cls:2},
+  {id:115,name:"اسماعيل محمد طامر",score:18,cls:2},
+  {id:116,name:"مهند ابراهيم الحائري",score:17,cls:3},
+];
+
+function getLevel(score) {
+  if (score >= 18) return {label:'ممتاز', cls:'excellent', badge:'badge-excellent', pill:'pill-excellent'};
+  if (score >= 15) return {label:'جيد جداً', cls:'vgood', badge:'badge-vgood', pill:'pill-vgood'};
+  if (score >= 12) return {label:'جيد', cls:'good', badge:'badge-good', pill:'pill-good'};
+  return {label:'ضعيف', cls:'weak', badge:'badge-weak', pill:'pill-weak'};
+}
+
+function avg(arr) {
+  if (!arr.length) return 0;
+  return (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1);
+}
+
+// ============================================================
+// PAGE SWITCHING
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const titles = {overview:'📊 لوحة الفصول', students:'👥 الطلاب', profile:'👤 بياناتي الشخصية', recommendations:'💡 التوصيات'};
+  document.getElementById('pageTitle').textContent = titles[name];
+  // mark active nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick').includes(name)) n.classList.add('active');
+  });
+  if (name === 'students') renderGlobalTable(rawData);
+  if (name === 'profile') renderProfile();
+}
+
+// ============================================================
+// CLASS PAGE
+// ============================================================
+let currentClass = 1;
+function switchClass(num, el) {
+  document.querySelectorAll('.class-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentClass = num;
+  renderClassPage(num);
+}
+
+function renderClassPage(cls) {
+  const students = rawData.filter(s => s.cls === cls).sort((a,b) => b.score-a.score);
+  const scores = students.map(s => s.score);
+  const av = avg(scores);
+  const max = Math.max(...scores);
+  const min = Math.min(...scores);
+  const levels = {excellent:0, vgood:0, good:0, weak:0};
+  students.forEach(s => { const l = getLevel(s.score); levels[l.cls]++; });
+
+  const content = document.getElementById('classContent');
+  content.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">👨‍🎓</div>
+        <div class="stat-value">${students.length}</div>
+        <div class="stat-label">عدد الطلاب</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value">${av}</div>
+        <div class="stat-label">المتوسط العام</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value">${max}</div>
+        <div class="stat-label">أعلى درجة</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="stat-icon">📉</div>
+        <div class="stat-value">${min}</div>
+        <div class="stat-label">أدنى درجة</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">📊 توزيع الدرجات</div>
+        <div class="bar-chart" id="barChart${cls}"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🎯 توزيع المستويات</div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 36 36" id="donut${cls}"></svg>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--excellent)"></div><span class="legend-label">ممتاز</span><span class="legend-val" style="color:var(--excellent)">${levels.excellent}</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--vgood)"></div><span class="legend-label">جيد جداً</span><span class="legend-val" style="color:var(--vgood)">${levels.vgood}</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--good)"></div><span class="legend-label">جيد</span><span class="legend-val" style="color:var(--good)">${levels.good}</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--weak)"></div><span class="legend-label">ضعيف</span><span class="legend-val" style="color:var(--weak)">${levels.weak}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <h3>ترتيب طلاب الفصل ${cls}-3</h3>
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="ابحث عن طالب..." id="classSearch${cls}" oninput="filterClassTable(${cls})">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>الترتيب</th><th>اسم الطالب</th><th>الدرجة / 20</th><th>المستوى</th><th>التقدم</th></tr></thead>
+          <tbody id="classTableBody${cls}"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  renderClassTable(cls, students);
+  renderBarChart(cls, students);
+  renderDonut(`donut${cls}`, levels, students.length);
+}
+
+function renderClassTable(cls, students) {
+  const tbody = document.getElementById(`classTableBody${cls}`);
+  if (!tbody) return;
+  tbody.innerHTML = students.map((s,i) => {
+    const lv = getLevel(s.score);
+    const pct = (s.score/20*100).toFixed(0);
+    const colors = {excellent:'var(--excellent)', vgood:'var(--vgood)', good:'var(--good)', weak:'var(--weak)'};
+    return `<tr>
+      <td><span class="rank-num ${i<3?'top3':''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</span></td>
+      <td style="font-weight:600">${s.name}</td>
+      <td><span class="score-badge ${lv.badge}">${s.score}</span></td>
+      <td><span class="level-pill ${lv.pill}">${lv.label}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${colors[lv.cls]}"></div></div>
+          <span style="font-size:11px;color:var(--muted)">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterClassTable(cls) {
+  const q = document.getElementById(`classSearch${cls}`).value.trim().toLowerCase();
+  const students = rawData.filter(s => s.cls === cls).sort((a,b) => b.score-a.score);
+  const filtered = q ? students.filter(s => s.name.includes(q)) : students;
+  renderClassTable(cls, filtered);
+}
+
+function renderBarChart(cls, students) {
+  const brackets = [
+    {label:'20', min:20, max:20, color:'#10b981'},
+    {label:'18-19', min:18, max:19, color:'#34d399'},
+    {label:'15-17', min:15, max:17, color:'#3b82f6'},
+    {label:'12-14', min:12, max:14, color:'#f59e0b'},
+    {label:'<12', min:0, max:11, color:'#ef4444'},
+  ];
+  const counts = brackets.map(b => students.filter(s => s.score >= b.min && s.score <= b.max).length);
+  const maxC = Math.max(...counts, 1);
+  const container = document.getElementById(`barChart${cls}`);
+  if (!container) return;
+  container.innerHTML = brackets.map((b,i) => `
+    <div class="bar-wrap">
+      <span class="bar-val" style="color:${b.color}">${counts[i]}</span>
+      <div class="bar-col">
+        <div class="bar-fill" style="background:${b.color};height:${(counts[i]/maxC*100)}%"></div>
+      </div>
+      <span class="bar-label">${b.label}</span>
+    </div>
+  `).join('');
+}
+
+function renderDonut(id, levels, total) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const data = [
+    {key:'excellent', val:levels.excellent, color:'#10b981'},
+    {key:'vgood', val:levels.vgood, color:'#3b82f6'},
+    {key:'good', val:levels.good, color:'#f59e0b'},
+    {key:'weak', val:levels.weak, color:'#ef4444'},
+  ];
+  const cx=18, cy=18, r=15.9, circ=2*Math.PI*r;
+  let offset=0;
+  const paths = data.map(d => {
+    if (!d.val) return '';
+    const pct = d.val/total;
+    const dash = pct*circ;
+    const gap = circ - dash;
+    const seg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="3.5"
+      stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offset*circ}" stroke-linecap="round"/>`;
+    offset += pct;
+    return seg;
+  }).join('');
+  el.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3.5"/>
+    ${paths}
+    <text x="${cx}" y="${cy-2}" text-anchor="middle" fill="#f1f5f9" font-size="6" font-family="Cairo" font-weight="bold">${total}</text>
+    <text x="${cx}" y="${cy+5}" text-anchor="middle" fill="#94a3b8" font-size="3.5" font-family="Cairo">طالب</text>`;
+}
+
+// ============================================================
+// GLOBAL TABLE
+// ============================================================
+function renderGlobalTable(students) {
+  const sorted = [...students].sort((a,b) => b.score-a.score);
+  const tbody = document.getElementById('globalTableBody');
+  const colors = {excellent:'var(--excellent)', vgood:'var(--vgood)', good:'var(--good)', weak:'var(--weak)'};
+  tbody.innerHTML = sorted.map((s,i) => {
+    const lv = getLevel(s.score);
+    const pct = (s.score/20*100).toFixed(0);
+    return `<tr>
+      <td><span class="rank-num ${i<3?'top3':''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</span></td>
+      <td style="font-weight:600">${s.name}</td>
+      <td><span class="score-badge ${lv.badge}" style="font-size:12px;padding:3px 8px">${s.cls}-3</span></td>
+      <td><span class="score-badge ${lv.badge}">${s.score}</span></td>
+      <td><span class="level-pill ${lv.pill}">${lv.label}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${colors[lv.cls]}"></div></div>
+          <span style="font-size:11px;color:var(--muted)">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterGlobal() {
+  const q = document.getElementById('globalSearch').value.trim().toLowerCase();
+  const filtered = q ? rawData.filter(s => s.name.includes(q)) : rawData;
+  renderGlobalTable(filtered);
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
+function renderProfile() {
+  // Avg
+  const allScores = rawData.map(s => s.score);
+  document.getElementById('profileAvg').textContent = avg(allScores) + ' / 20';
+
+  // Class compare
+  const cc = document.getElementById('classCompare');
+  const colors = ['#3b82f6','#06b6d4','#10b981','#f59e0b'];
+  cc.innerHTML = [1,2,3,4].map((c,i) => {
+    const sc = rawData.filter(s=>s.cls===c).map(s=>s.score);
+    const a = avg(sc);
+    return `<div class="h-bar-row">
+      <span class="h-bar-label">الفصل ${c}-3</span>
+      <div class="h-bar-track"><div class="h-bar-fill" style="width:${(a/20*100)}%;background:${colors[i]}"></div></div>
+      <span class="h-bar-val" style="color:${colors[i]}">${a}</span>
+    </div>`;
+  }).join('');
+
+  // Global donut
+  const levels = {excellent:0, vgood:0, good:0, weak:0};
+  rawData.forEach(s => { const l = getLevel(s.score); levels[l.cls]++; });
+  renderDonut('globalDonut', levels, rawData.length);
+  document.getElementById('globalLegend').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:var(--excellent)"></div><span class="legend-label">ممتاز</span><span class="legend-val" style="color:var(--excellent)">${levels.excellent} (${(levels.excellent/rawData.length*100).toFixed(0)}%)</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--vgood)"></div><span class="legend-label">جيد جداً</span><span class="legend-val" style="color:var(--vgood)">${levels.vgood} (${(levels.vgood/rawData.length*100).toFixed(0)}%)</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--good)"></div><span class="legend-label">جيد</span><span class="legend-val" style="color:var(--good)">${levels.good} (${(levels.good/rawData.length*100).toFixed(0)}%)</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--weak)"></div><span class="legend-label">ضعيف</span><span class="legend-val" style="color:var(--weak)">${levels.weak} (${(levels.weak/rawData.length*100).toFixed(0)}%)</span></div>
+  `;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderClassPage(1);
+</script>
+</body>
+</html>
