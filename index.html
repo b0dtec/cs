@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم نتائج الطلاب - مجمع الصديق</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+
+    <!-- React & ReactDOM (CDN) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (CDN) for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+
+        // --- Inline Icons (Replacements for lucide-react to work completely offline/standalone) ---
+        const Icon = ({ children, size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+        const Users = (p) => <Icon {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Icon>;
+        const BookOpen = (p) => <Icon {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
+        const User = (p) => <Icon {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></Icon>;
+        const Lightbulb = (p) => <Icon {...p}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></Icon>;
+        const Search = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></Icon>;
+        const TrendingUp = (p) => <Icon {...p}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></Icon>;
+        const TrendingDown = (p) => <Icon {...p}><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></Icon>;
+        const Award = (p) => <Icon {...p}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></Icon>;
+        const BarChart3 = (p) => <Icon {...p}><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></Icon>;
+        const Menu = (p) => <Icon {...p}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></Icon>;
+        const X = (p) => <Icon {...p}><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></Icon>;
+        const Moon = (p) => <Icon {...p}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></Icon>;
+        const Sun = (p) => <Icon {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></Icon>;
+
+        // --- Data Preparation ---
+        const rawData = [
+            { classId: "4-3", name: "مشعل احمد عمر ابوشانين", score: 12, id: 1 },
+            { classId: "3-3", name: "مالك موسى عالي الشمراني", score: 11, id: 2 },
+            { classId: "2-3", name: "مهند عمار عبدالله اسماعيل", score: 19, id: 3 },
+            { classId: "3-3", name: "بدر عبد الله احمد الجدعاني", score: 17, id: 4 },
+            { classId: "1-3", name: "عبد الله محمد عبدالله احمد", score: 13, id: 5 },
+            { classId: "1-3", name: "راجح محمد عبدالله احمد", score: 14, id: 6 },
+            { classId: "2-3", name: "عبد الرحمن محمد الدواسي", score: 20, id: 7 },
+            { classId: "1-3", name: "وليد عبد المجيد محمد الصومعي", score: 20, id: 8 },
+            { classId: "2-3", name: "علي أحمد علي حسين", score: 19, id: 9 },
+            { classId: "2-3", name: "سعود محمد نور عبد المطلب", score: 20, id: 10 },
+            { classId: "1-3", name: "احمد ماجد احمد محمد", score: 19, id: 11 },
+            { classId: "1-3", name: "امجد محمد", score: 20, id: 12 },
+            { classId: "2-3", name: "محمد ياسر عوض الرشيدي", score: 18, id: 13 },
+            { classId: "4-3", name: "الحسن عبدالله مهيوب", score: 19, id: 14 },
+            { classId: "2-3", name: "وسام مصطفى احمد قاهو", score: 12, id: 15 },
+            { classId: "4-3", name: "يوسف شعبان داود حسن", score: 20, id: 16 },
+            { classId: "2-3", name: "محمد سليمان حسین طاهر", score: 18, id: 17 },
+            { classId: "3-3", name: "بشار عبد العزيز محمد سيف فرج", score: 20, id: 18 },
+            { classId: "4-3", name: "صلاح مصلح عبدالاله", score: 20, id: 19 },
+            { classId: "1-3", name: "عبد الله عمار محمد ناصر", score: 20, id: 20 },
+            { classId: "4-3", name: "كرم أبو بكر قاسم غانم الاحمدي", score: 20, id: 21 },
+            { classId: "4-3", name: "همام صالح عبد الله محمد اليافعي", score: 20, id: 22 },
+            { classId: "2-3", name: "فهد محمد السناني", score: 17, id: 23 },
+            { classId: "2-3", name: "ادم عبد الرحمن صلاح عبد الرحمن", score: 20, id: 24 },
+            { classId: "1-3", name: "طلال وضاح حسن", score: 14, id: 25 },
+            { classId: "2-3", name: "اسامه خضير الهزازي", score: 20, id: 26 },
+            { classId: "1-3", name: "سالم عبدالله سالم زبيدي", score: 18, id: 27 },
+            { classId: "2-3", name: "ادم عبد الرحمن صلاح", score: 20, id: 28 },
+            { classId: "1-3", name: "هاشم احمد محسن عبد الرب السعدي اليافعي", score: 19, id: 29 },
+            { classId: "2-3", name: "عبده أحمد محمد جمالي", score: 19, id: 30 },
+            { classId: "2-3", name: "حمزة سيف سالم احمد", score: 20, id: 31 },
+            { classId: "3-3", name: "فيصل عبد الله حسن دغريري", score: 14, id: 32 },
+            { classId: "1-3", name: "حسن محمد مصطفى إبراهيم", score: 17, id: 33 },
+            { classId: "2-3", name: "نايف علي محمد خضر", score: 20, id: 34 },
+            { classId: "4-3", name: "نادر محمد مبارك الحداد", score: 20, id: 35 },
+            { classId: "2-3", name: "زياد يوسف علي محمد", score: 19, id: 36 },
+            { classId: "1-3", name: "سامر حسن سعيد البيشي", score: 14, id: 37 },
+            { classId: "1-3", name: "زيد عمار عابدين بخيت", score: 14, id: 38 },
+            { classId: "3-3", name: "محمد جاوید اقبال علي", score: 20, id: 39 },
+            { classId: "3-3", name: "مهند محمد یونس ملا سامز بديع الرحمن", score: 10, id: 40 },
+            { classId: "2-3", name: "عبد البصير سمي علي حيدر", score: 8, id: 41 },
+            { classId: "2-3", name: "عبد الاله عبد الله حسن القرشي", score: 20, id: 42 },
+            { classId: "2-3", name: "سالم يوسف احمد مجاعش", score: 20, id: 43 },
+            { classId: "4-3", name: "همام صالح عبد الله محمد اليافعي", score: 19, id: 44 },
+            { classId: "2-3", name: "محمد على أميدو محمد", score: 20, id: 45 },
+            { classId: "3-3", name: "مسعود سید نور محمد", score: 19, id: 46 },
+            { classId: "3-3", name: "مساعد احمد عقيل الجوفي", score: 20, id: 47 },
+            { classId: "4-3", name: "ناصر عوض احمد عوض قاسم الهلالي", score: 20, id: 48 },
+            { classId: "2-3", name: "عبد الله على عبد الله خير الله", score: 20, id: 49 },
+            { classId: "1-3", name: "أنس جمال الدين الدين مياه توران علي", score: 19, id: 50 },
+            { classId: "4-3", name: "عمار على صالح", score: 19, id: 51 },
+            { classId: "3-3", name: "عبد الرحمن محمد ياسين عبد الرحمن", score: 10, id: 52 },
+            { classId: "3-3", name: "حسین صالح حسين بوبك", score: 18, id: 53 },
+            { classId: "2-3", name: "محمد أحمد محمد بصير", score: 18, id: 54 },
+            { classId: "1-3", name: "عبد المحسن على أميدو محمد", score: 15, id: 55 },
+            { classId: "4-3", name: "حمدان رائد احمد صالح", score: 16, id: 56 },
+            { classId: "1-3", name: "عبد الله على عوض عامل", score: 9, id: 57 },
+            { classId: "1-3", name: "عزام عمر علي عيسى المسعودي", score: 18, id: 58 },
+            { classId: "2-3", name: "خالد جابر عمر بيني", score: 18, id: 59 },
+            { classId: "3-3", name: "خبائي نور حسن ولي حسين قادر حسين", score: 10, id: 60 },
+            { classId: "1-3", name: "عبد السلام جلال على الماحل", score: 19, id: 61 },
+            { classId: "1-3", name: "عبد السلام جلال على الماحل", score: 20, id: 62 },
+            { classId: "3-3", name: "وسيم سالم فتيني قبيصي", score: 10, id: 63 },
+            { classId: "2-3", name: "ضياء يحيى الغيثي", score: 20, id: 64 },
+            { classId: "2-3", name: "اکرم متوکل سید محمد", score: 18, id: 65 },
+            { classId: "4-3", name: "نادر محمد الحداد", score: 20, id: 66 },
+            { classId: "3-3", name: "عماد محسن احمد حسن السعدي", score: 18, id: 67 },
+            { classId: "4-3", name: "ریان احمد قاصر", score: 13, id: 68 },
+            { classId: "3-3", name: "ماهر محمد جوهر", score: 10, id: 69 },
+            { classId: "4-3", name: "محمد احمد محي الدين احمد", score: 11, id: 70 },
+            { classId: "3-3", name: "ریدان مطهر علي القديمي", score: 8, id: 71 },
+            { classId: "1-3", name: "محمد سامي", score: 16, id: 72 },
+            { classId: "2-3", name: "مهند ابكر يعقوب ادريس", score: 11, id: 73 },
+            { classId: "4-3", name: "مؤيد مصطفى عبد الرحمن محمد", score: 20, id: 74 },
+            { classId: "4-3", name: "مسعد زاهد حسين القمان حكيم", score: 20, id: 75 },
+            { classId: "1-3", name: "خالد جابر عبدالله شافعي", score: 12, id: 76 },
+            { classId: "1-3", name: "محمد رضوان الغامدي", score: 20, id: 77 },
+            { classId: "1-3", name: "عمار يوسف", score: 13, id: 78 },
+            { classId: "1-3", name: "محمد طه حسين صالح", score: 15, id: 79 },
+            { classId: "3-3", name: "لؤي عبد الله الأهدل", score: 20, id: 80 },
+            { classId: "2-3", name: "عمر سامي احمد ادريس", score: 19, id: 81 },
+            { classId: "4-3", name: "نايف عبد العزيز قاسم محمد", score: 17, id: 82 },
+            { classId: "1-3", name: "انس محمد فليس", score: 17, id: 83 },
+            { classId: "3-3", name: "محمد جاعم صالح دهشل", score: 20, id: 84 },
+            { classId: "3-3", name: "قاهد عبد الرحمن حسن شعيفان", score: 20, id: 85 },
+            { classId: "3-3", name: "عبد الرحمن محمد ياسين عبد الرحمن", score: 8, id: 86 },
+            { classId: "4-3", name: "ماهر بخيت سعيد الشمراني", score: 20, id: 87 },
+            { classId: "1-3", name: "ابراهيم سالم علي بن بشر", score: 20, id: 88 },
+            { classId: "4-3", name: "رامي احمد عبد القوي", score: 20, id: 89 },
+            { classId: "3-3", name: "حسن عثمان محمد صالح", score: 20, id: 90 },
+            { classId: "4-3", name: "محمد جبريل صالح آدم", score: 20, id: 91 },
+            { classId: "2-3", name: "أحمد محمد أحمد سالم", score: 20, id: 92 },
+            { classId: "2-3", name: "تركي بكر عبد الحكيم احمد", score: 20, id: 93 },
+            { classId: "3-3", name: "انس صلاح قاسم", score: 20, id: 94 },
+            { classId: "2-3", name: "عبد الرحمن آدم", score: 20, id: 95 },
+            { classId: "1-3", name: "حسب الله ادريس فضه", score: 11, id: 96 },
+            { classId: "1-3", name: "حسب الله ادريس فضه", score: 11, id: 97 },
+            { classId: "3-3", name: "وسیم عمر ابراهيم موسى", score: 18, id: 98 },
+            { classId: "4-3", name: "محمد سعيد الرفاعي", score: 20, id: 99 },
+            { classId: "3-3", name: "عدي علي حميد عبده", score: 16, id: 100 },
+            { classId: "4-3", name: "ياسر عرفات قاسم", score: 20, id: 101 },
+            { classId: "1-3", name: "محمد عبده فتح جلال", score: 20, id: 102 },
+            { classId: "3-3", name: "عبد الله علي مختار", score: 16, id: 103 },
+            { classId: "1-3", name: "ابراهیم هاشم محمد", score: 18, id: 104 },
+            { classId: "3-3", name: "عيسى محمد عيسى ادريس", score: 15, id: 105 },
+            { classId: "3-3", name: "ابراهيم محمد نور محمد زین", score: 18, id: 106 },
+            { classId: "1-3", name: "عبد العزيز بشير مجاهد على القاضي", score: 20, id: 107 },
+            { classId: "3-3", name: "محمد ابراهيم أبوبكر", score: 6, id: 108 },
+            { classId: "1-3", name: "حسين هاشم مياه حسین", score: 20, id: 109 },
+            { classId: "1-3", name: "محمد طه حسين صالح", score: 20, id: 110 },
+            { classId: "2-3", name: "احمد انور احمد عراش", score: 20, id: 111 },
+            { classId: "3-3", name: "شعیب هارون", score: 13, id: 112 },
+            { classId: "4-3", name: "يزن إبراهيم النور", score: 10, id: 113 },
+            { classId: "2-3", name: "محمد احمد بصير", score: 19, id: 114 },
+            { classId: "2-3", name: "اسماعیل محمد طاهر", score: 18, id: 115 },
+            { classId: "3-3", name: "مهند إبراهيم الحارثي", score: 17, id: 116 }
+        ];
+
+        // --- Helper Functions ---
+        const getLevel = (score) => {
+            if (score >= 18) return { label: 'ممتاز', color: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30', bar: 'bg-emerald-500' };
+            if (score >= 15) return { label: 'جيد جداً', color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30', bar: 'bg-blue-500' };
+            if (score >= 12) return { label: 'جيد', color: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30', bar: 'bg-amber-500' };
+            return { label: 'ضعيف', color: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30', bar: 'bg-rose-500' };
+        };
+
+        const calculateStats = (data) => {
+            if (data.length === 0) return { avg: 0, max: 0, min: 0, count: 0, distribution: {} };
+            let total = 0;
+            let max = -1;
+            let min = 21;
+            const distribution = { 'ممتاز': 0, 'جيد جداً': 0, 'جيد': 0, 'ضعيف': 0 };
+
+            data.forEach(student => {
+                total += student.score;
+                if (student.score > max) max = student.score;
+                if (student.score < min) min = student.score;
+                distribution[getLevel(student.score).label]++;
+            });
+
+            return {
+                avg: (total / data.length).toFixed(2),
+                max, min, count: data.length, distribution
+            };
+        };
+
+        // --- Components ---
+        const ClassesView = () => {
+            const [selectedClass, setSelectedClass] = useState("1");
+            const classData = useMemo(() => {
+                const filtered = rawData.filter(s => s.classId === `${selectedClass}-3`);
+                return filtered.sort((a, b) => b.score - a.score);
+            }, [selectedClass]);
+
+            const stats = useMemo(() => calculateStats(classData), [classData]);
+
+            return (
+                <div className="space-y-6 fade-in">
+                <div className="flex gap-2 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-x-auto transition-colors duration-300">
+                    {[1, 2, 3, 4].map(num => (
+                    <button
+                        key={num}
+                        onClick={() => setSelectedClass(num.toString())}
+                        className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
+                        selectedClass === num.toString() 
+                            ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 transform scale-[1.02]' 
+                            : 'bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600'
+                        }`}
+                    >
+                        الفصل {num} - 3
+                    </button>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+                    <div className="p-3.5 bg-violet-100 dark:bg-violet-500/20 rounded-xl text-violet-600 dark:text-violet-400">
+                        <Users size={26} />
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">عدد الطلاب</p>
+                        <p className="text-2xl font-black text-slate-800 dark:text-white">{stats.count}</p>
+                    </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+                    <div className="p-3.5 bg-sky-100 dark:bg-sky-500/20 rounded-xl text-sky-600 dark:text-sky-400">
+                        <BarChart3 size={26} />
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">المتوسط</p>
+                        <p className="text-2xl font-black text-slate-800 dark:text-white">{stats.avg} <span className="text-sm font-semibold text-slate-400 dark:text-slate-500">/ 20</span></p>
+                    </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+                    <div className="p-3.5 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400">
+                        <TrendingUp size={26} />
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">أعلى درجة</p>
+                        <p className="text-2xl font-black text-slate-800 dark:text-white">{stats.max}</p>
+                    </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+                    <div className="p-3.5 bg-rose-100 dark:bg-rose-500/20 rounded-xl text-rose-600 dark:text-rose-400">
+                        <TrendingDown size={26} />
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">أقل درجة</p>
+                        <p className="text-2xl font-black text-slate-800 dark:text-white">{stats.min}</p>
+                    </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 lg:col-span-1 transition-colors duration-300">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center">
+                        <Award className="ml-2 text-violet-500 dark:text-violet-400" size={22} />
+                        توزيع المستويات
+                    </h3>
+                    <div className="space-y-5">
+                        {[
+                        { label: 'ممتاز', count: stats.distribution['ممتاز'], color: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400' },
+                        { label: 'جيد جداً', count: stats.distribution['جيد جداً'], color: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-400' },
+                        { label: 'جيد', count: stats.distribution['جيد'], color: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400' },
+                        { label: 'ضعيف', count: stats.distribution['ضعيف'], color: 'bg-rose-500', text: 'text-rose-700 dark:text-rose-400' },
+                        ].map(item => {
+                        const percentage = stats.count > 0 ? Math.round((item.count / stats.count) * 100) : 0;
+                        return (
+                            <div key={item.label} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className={`font-bold ${item.text}`}>{item.label}</span>
+                                <span className="text-slate-500 dark:text-slate-400 font-medium">{item.count} طلاب ({percentage}%)</span>
+                            </div>
+                            <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                                <div className={`h-full rounded-full ${item.color} transition-all duration-1000 ease-out`} style={{ width: `${percentage}%` }}></div>
+                            </div>
+                            </div>
+                        );
+                        })}
+                    </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 lg:col-span-2 overflow-hidden flex flex-col transition-colors duration-300">
+                    <div className="p-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex justify-between items-center">
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">قائمة الطلاب ({classData.length})</h3>
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-700 px-3 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600">مرتبة تنازلياً</span>
+                    </div>
+                    <div className="overflow-x-auto flex-1 max-h-[450px] custom-scrollbar">
+                        <table className="w-full text-right">
+                        <thead className="bg-white dark:bg-slate-800 sticky top-0 shadow-sm z-10">
+                            <tr className="text-slate-500 dark:text-slate-400 text-sm border-b border-slate-100 dark:border-slate-700">
+                            <th className="py-4 px-5 font-bold">م</th>
+                            <th className="py-4 px-5 font-bold">اسم الطالب</th>
+                            <th className="py-4 px-5 font-bold text-center">الدرجة</th>
+                            <th className="py-4 px-5 font-bold text-center">المستوى</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50">
+                            {classData.map((student, index) => {
+                            const level = getLevel(student.score);
+                            return (
+                                <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+                                <td className="py-3.5 px-5 text-slate-400 dark:text-slate-500 text-sm font-medium group-hover:text-violet-500 transition-colors">{index + 1}</td>
+                                <td className="py-3.5 px-5 font-semibold text-slate-800 dark:text-slate-200">{student.name}</td>
+                                <td className="py-3.5 px-5 text-center font-black text-slate-700 dark:text-slate-100">{student.score}</td>
+                                <td className="py-3.5 px-5 text-center">
+                                    <span className={`px-3.5 py-1.5 rounded-full text-xs font-bold border ${level.color} shadow-sm inline-block min-w-[80px]`}>
+                                    {level.label}
+                                    </span>
+                                </td>
+                                </tr>
+                            )
+                            })}
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            );
+        };
+
+        const StudentsView = () => {
+            const [searchTerm, setSearchTerm] = useState("");
+            const [filterClass, setFilterClass] = useState("الكل");
+
+            const filteredStudents = useMemo(() => {
+                return rawData.filter(student => {
+                const matchesSearch = student.name.includes(searchTerm);
+                const matchesClass = filterClass === "الكل" || student.classId === filterClass;
+                return matchesSearch && matchesClass;
+                }).sort((a, b) => b.score - a.score);
+            }, [searchTerm, filterClass]);
+
+            return (
+                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 fade-in transition-colors duration-300">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">سجل جميع الطلاب</h2>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div className="relative">
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500">
+                            <Search size={18} />
+                        </div>
+                        <input 
+                        type="text" 
+                        placeholder="ابحث عن طالب..." 
+                        className="pl-4 pr-12 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 w-full sm:w-72 transition-all"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <select 
+                        className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 font-medium transition-all cursor-pointer"
+                        value={filterClass}
+                        onChange={(e) => setFilterClass(e.target.value)}
+                    >
+                        <option value="الكل">جميع الفصول</option>
+                        <option value="1-3">فصل 1-3</option>
+                        <option value="2-3">فصل 2-3</option>
+                        <option value="3-3">فصل 3-3</option>
+                        <option value="4-3">فصل 4-3</option>
+                    </select>
+                    </div>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700 max-h-[600px] custom-scrollbar">
+                    <table className="w-full text-right">
+                    <thead className="bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-10 backdrop-blur-sm">
+                        <tr className="text-slate-500 dark:text-slate-400 text-sm border-b border-slate-100 dark:border-slate-700">
+                        <th className="py-4 px-5 font-bold">م</th>
+                        <th className="py-4 px-5 font-bold">اسم الطالب</th>
+                        <th className="py-4 px-5 font-bold">الفصل</th>
+                        <th className="py-4 px-5 font-bold text-center">الدرجة</th>
+                        <th className="py-4 px-5 font-bold text-center">المستوى</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50">
+                        {filteredStudents.map((student, index) => {
+                        const level = getLevel(student.score);
+                        return (
+                            <tr key={`${student.id}-${index}`} className="hover:bg-violet-50/50 dark:hover:bg-slate-700/50 transition-colors group">
+                            <td className="py-3.5 px-5 text-slate-400 dark:text-slate-500 text-sm font-medium">{index + 1}</td>
+                            <td className="py-3.5 px-5 font-semibold text-slate-800 dark:text-slate-200">{student.name}</td>
+                            <td className="py-3.5 px-5 text-slate-600 dark:text-slate-300">
+                                <span className="bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-md text-xs font-bold border border-slate-200 dark:border-slate-600">{student.classId}</span>
+                            </td>
+                            <td className="py-3.5 px-5 text-center font-black text-slate-700 dark:text-slate-100">{student.score}</td>
+                            <td className="py-3.5 px-5 text-center">
+                                <span className={`px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm inline-block min-w-[70px] ${level.color}`}>
+                                {level.label}
+                                </span>
+                            </td>
+                            </tr>
+                        )
+                        })}
+                        {filteredStudents.length === 0 && (
+                        <tr>
+                            <td colSpan="5" className="py-12 text-center text-slate-500 dark:text-slate-400 font-medium text-lg">
+                            <div className="flex justify-center mb-3 opacity-50"><Search size={32} /></div>
+                            لا يوجد طلاب مطابقين للبحث
+                            </td>
+                        </tr>
+                        )}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            );
+        };
+
+        const ProfileView = () => {
+            return (
+                <div className="max-w-2xl mx-auto fade-in">
+                <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+                    <div className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-800 dark:to-fuchsia-900 h-40 relative">
+                    <div className="absolute inset-0 bg-white/10 dark:bg-black/10 backdrop-blur-[2px]"></div>
+                    </div>
+                    <div className="px-8 pb-10">
+                    <div className="relative flex justify-center -mt-20 mb-5">
+                        <div className="w-36 h-36 bg-white dark:bg-slate-800 rounded-full border-4 border-white dark:border-slate-800 shadow-xl flex items-center justify-center text-violet-500 dark:text-violet-400 relative z-10 transition-colors">
+                        <User size={72} />
+                        </div>
+                    </div>
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-2">أستاذ المادة</h2>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-lg">مجمع الصديق المتوسط</p>
+                    </div>
+                    
+                    <div className="space-y-5 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center border-b border-slate-200 dark:border-slate-700/50 pb-4">
+                        <span className="w-1/3 text-slate-500 dark:text-slate-400 font-bold">المادة:</span>
+                        <span className="w-2/3 text-slate-800 dark:text-slate-200 font-semibold text-lg">غير محدد <span className="text-sm font-normal text-slate-400">(اختبار الفترة الثانية)</span></span>
+                        </div>
+                        <div className="flex items-center border-b border-slate-200 dark:border-slate-700/50 pb-4">
+                        <span className="w-1/3 text-slate-500 dark:text-slate-400 font-bold">المرحلة:</span>
+                        <span className="w-2/3 text-slate-800 dark:text-slate-200 font-semibold text-lg">الثالث متوسط</span>
+                        </div>
+                        <div className="flex items-center border-b border-slate-200 dark:border-slate-700/50 pb-4">
+                        <span className="w-1/3 text-slate-500 dark:text-slate-400 font-bold">إجمالي الفصول:</span>
+                        <span className="w-2/3 text-slate-800 dark:text-slate-200 font-semibold text-lg">4 فصول</span>
+                        </div>
+                        <div className="flex items-center">
+                        <span className="w-1/3 text-slate-500 dark:text-slate-400 font-bold">إجمالي الطلاب:</span>
+                        <span className="w-2/3 text-slate-800 dark:text-slate-200 font-semibold text-lg">{rawData.length} طالب</span>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            );
+        };
+
+        const RecommendationsView = () => {
+            const classes = ["1-3", "2-3", "3-3", "4-3"];
+            const classStats = classes.map(cId => {
+                const students = rawData.filter(s => s.classId === cId);
+                return {
+                name: `فصل ${cId}`,
+                avg: Number(calculateStats(students).avg),
+                weakCount: students.filter(s => s.score < 12).length
+                };
+            });
+
+            const overallAvg = (classStats.reduce((acc, curr) => acc + curr.avg, 0) / 4).toFixed(2);
+            const bestClass = [...classStats].sort((a,b) => b.avg - a.avg)[0];
+            const needsHelpClass = [...classStats].sort((a,b) => b.weakCount - a.weakCount)[0];
+
+            return (
+                <div className="space-y-6 fade-in">
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+                    <div className="flex items-center gap-4 mb-8">
+                    <div className="p-4 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-2xl shadow-sm">
+                        <Lightbulb size={28} />
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-800 dark:text-white">تحليل الأداء والتوصيات</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/20 border border-emerald-100 dark:border-emerald-800/50 p-6 rounded-2xl shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 dark:bg-emerald-400/5 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+                        <h3 className="font-bold text-emerald-800 dark:text-emerald-300 mb-3 text-lg relative z-10">نظرة عامة إيجابية</h3>
+                        <p className="text-emerald-900 dark:text-emerald-100/80 leading-relaxed font-medium relative z-10">
+                        المتوسط العام للمرحلة هو <span className="font-black text-xl text-emerald-600 dark:text-emerald-400 mx-1">{overallAvg}</span> من 20. 
+                        يبرز <span className="font-black text-emerald-700 dark:text-emerald-300 mx-1">{bestClass.name}</span> بأعلى أداء بمتوسط بلغ ({bestClass.avg}).
+                        </p>
+                    </div>
+                    <div className="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-900/30 dark:to-orange-900/20 border border-rose-100 dark:border-rose-800/50 p-6 rounded-2xl shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 dark:bg-rose-400/5 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+                        <h3 className="font-bold text-rose-800 dark:text-rose-300 mb-3 text-lg relative z-10">نقاط تتطلب التدخل</h3>
+                        <p className="text-rose-900 dark:text-rose-100/80 leading-relaxed font-medium relative z-10">
+                        رُصد عدد <span className="font-black text-xl text-rose-600 dark:text-rose-400 mx-1">{needsHelpClass.weakCount} طلاب</span> في <span className="font-black text-rose-700 dark:text-rose-300 mx-1">{needsHelpClass.name}</span> حصلوا على تقييم (ضعيف). يُوصى بتوجيه خطة علاجية مكثفة لهذا الفصل.
+                        </p>
+                    </div>
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 mb-8">
+                    <h3 className="font-bold text-slate-800 dark:text-white mb-6 text-lg flex items-center gap-2">
+                        <BarChart3 className="text-violet-500" size={20} />
+                        مقارنة متوسط الفصول
+                    </h3>
+                    <div className="h-64 flex items-end justify-around pt-6 px-4">
+                        {classStats.map((stat, index) => {
+                        const heightPercentage = (stat.avg / 20) * 100;
+                        return (
+                            <div key={stat.name} className="flex flex-col items-center w-full max-w-[80px] group">
+                            <div className="text-sm font-black text-slate-600 dark:text-slate-300 mb-3 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">{stat.avg}</div>
+                            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-t-xl relative overflow-hidden">
+                                <div 
+                                className="w-full bg-gradient-to-t from-violet-600 to-fuchsia-500 dark:from-violet-500 dark:to-fuchsia-400 rounded-t-xl transition-all duration-1000 ease-out shadow-inner" 
+                                style={{ height: `${heightPercentage}%`, minHeight: '30px' }}
+                                >
+                                <div className="absolute inset-0 bg-white/20 dark:bg-white/10 group-hover:opacity-0 transition-opacity"></div>
+                                </div>
+                            </div>
+                            <div className="mt-4 font-bold text-slate-700 dark:text-slate-200 text-sm bg-white dark:bg-slate-800 px-3 py-1 rounded-lg shadow-sm border border-slate-100 dark:border-slate-600">{stat.name}</div>
+                            </div>
+                        )
+                        })}
+                    </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                    <h3 className="font-bold text-slate-800 dark:text-white mb-4 text-lg border-b border-slate-100 dark:border-slate-700 pb-3">توصيات عامة للمرحلة</h3>
+                    <ul className="space-y-3">
+                        <li className="flex items-start gap-3 text-slate-600 dark:text-slate-300 font-medium">
+                        <div className="mt-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full p-1"><Award size={14} /></div>
+                        تشجيع الطلاب الحاصلين على درجة "ممتاز" للمحافظة على مستواهم بمهام إثرائية.
+                        </li>
+                        <li className="flex items-start gap-3 text-slate-600 dark:text-slate-300 font-medium">
+                        <div className="mt-1 bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-full p-1"><TrendingDown size={14} /></div>
+                        تخصيص أوراق عمل علاجية مبسطة للطلاب الحاصلين على أقل من 12 درجة.
+                        </li>
+                        <li className="flex items-start gap-3 text-slate-600 dark:text-slate-300 font-medium">
+                        <div className="mt-1 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full p-1"><BookOpen size={14} /></div>
+                        عقد جلسة مراجعة سريعة (15 دقيقة) لأبرز الأخطاء الشائعة في اختبار الفترة الثانية.
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('classes');
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+            const [isDarkMode, setIsDarkMode] = useState(false);
+
+            const toggleDarkMode = () => {
+                setIsDarkMode(!isDarkMode);
+            };
+
+            const menuItems = [
+                { id: 'classes', label: 'الفصول', icon: <BookOpen size={20} /> },
+                { id: 'students', label: 'الطلاب', icon: <Users size={20} /> },
+                { id: 'profile', label: 'بياناتي', icon: <User size={20} /> },
+                { id: 'recommendations', label: 'التوصيات', icon: <Lightbulb size={20} /> },
+            ];
+
+            const renderContent = () => {
+                switch (activeTab) {
+                case 'classes': return <ClassesView />;
+                case 'students': return <StudentsView />;
+                case 'profile': return <ProfileView />;
+                case 'recommendations': return <RecommendationsView />;
+                default: return <ClassesView />;
+                }
+            };
+
+            return (
+                <div className={`${isDarkMode ? 'dark bg-slate-900' : 'bg-slate-50'} min-h-screen transition-colors duration-300`}>
+                <div className="dark:text-slate-100 transition-colors duration-300">
+                    <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between h-20">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-violet-500/30">
+                                ص
+                            </div>
+                            <div>
+                                <h1 className="font-black text-2xl text-slate-900 dark:text-white leading-tight tracking-tight">مجمع الصديق</h1>
+                                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">نظام إدارة النتائج الذكي</span>
+                            </div>
+                            </div>
+                        </div>
+                        
+                        <div className="hidden sm:flex sm:items-center gap-2">
+                            <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl mr-4 border border-slate-200 dark:border-slate-700">
+                            {menuItems.map(item => (
+                                <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id)}
+                                className={`flex items-center px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                                    activeTab === item.id 
+                                    ? 'bg-white dark:bg-slate-700 text-violet-700 dark:text-violet-300 shadow-sm' 
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
+                                }`}
+                                >
+                                <span className="ml-2">{item.icon}</span>
+                                {item.label}
+                                </button>
+                            ))}
+                            </div>
+
+                            <button
+                            onClick={toggleDarkMode}
+                            className="p-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700"
+                            >
+                            {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-indigo-600" />}
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-3 sm:hidden">
+                            <button
+                            onClick={toggleDarkMode}
+                            className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-700"
+                            >
+                            {isDarkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-indigo-600" />}
+                            </button>
+                            <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2.5 bg-violet-100 dark:bg-slate-800 text-violet-700 dark:text-slate-300 rounded-xl"
+                            >
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+
+                    {isMobileMenuOpen && (
+                        <div className="sm:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-4 pt-4 pb-6 space-y-2 shadow-2xl w-full rounded-b-3xl absolute">
+                        {menuItems.map(item => (
+                            <button
+                            key={item.id}
+                            onClick={() => {
+                                setActiveTab(item.id);
+                                setIsMobileMenuOpen(false);
+                            }}
+                            className={`flex items-center w-full px-4 py-4 rounded-xl text-base font-bold transition-colors ${
+                                activeTab === item.id 
+                                ? 'bg-violet-50 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300' 
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                            }`}
+                            >
+                            <span className="ml-3">{item.icon}</span>
+                            {item.label}
+                            </button>
+                        ))}
+                        </div>
+                    )}
+                    </nav>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div className="mb-8 flex items-center text-slate-800 dark:text-white fade-in">
+                        <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 ml-4 text-violet-600 dark:text-violet-400">
+                        {menuItems.find(i => i.id === activeTab)?.icon}
+                        </div>
+                        <h2 className="text-3xl font-black">
+                        {menuItems.find(i => i.id === activeTab)?.label}
+                        </h2>
+                    </div>
+
+                    {renderContent()}
+                    </main>
+                </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
