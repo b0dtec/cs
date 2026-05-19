@@ -1,0 +1,1274 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ملف الإنجاز الإلكتروني</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Tajawal', sans-serif; }
+    
+    /* Tailwind Dark Mode Overrides */
+    html.dark { color-scheme: dark; }
+    html.dark body { @apply bg-slate-950 text-slate-50; }
+    html.dark input, html.dark textarea, html.dark select { @apply bg-slate-800 text-slate-50 border-slate-600; }
+    html.dark input:focus, html.dark textarea:focus, html.dark select:focus { @apply border-emerald-500; }
+    
+    /* Override all Tailwind light mode classes when dark mode is active */
+    html.dark .bg-white { @apply bg-slate-800; }
+    html.dark .bg-slate-50 { @apply bg-slate-950; }
+    html.dark .bg-slate-100 { @apply bg-slate-800; }
+    html.dark .bg-slate-200 { @apply bg-slate-700; }
+    html.dark .bg-slate-300 { @apply bg-slate-600; }
+    html.dark .bg-slate-400 { @apply bg-slate-500; }
+    
+    html.dark .text-slate-800 { @apply text-slate-50; }
+    html.dark .text-slate-700 { @apply text-slate-200; }
+    html.dark .text-slate-600 { @apply text-slate-300; }
+    html.dark .text-slate-500 { @apply text-slate-400; }
+    html.dark .text-slate-400 { @apply text-slate-500; }
+    html.dark .text-slate-900 { @apply text-slate-50; }
+    
+    html.dark .border-slate-200 { @apply border-slate-700; }
+    html.dark .border-slate-300 { @apply border-slate-600; }
+    html.dark .border-slate-100 { @apply border-slate-800; }
+    
+    /* Light backgrounds to dark */
+    html.dark .bg-emerald-50 { @apply bg-emerald-900; }
+    html.dark .bg-blue-50 { @apply bg-blue-900; }
+    html.dark .bg-purple-50 { @apply bg-purple-900; }
+    html.dark .bg-amber-50 { @apply bg-amber-900; }
+    html.dark .bg-green-50 { @apply bg-green-900; }
+    html.dark .bg-lime-50 { @apply bg-lime-900; }
+    html.dark .bg-orange-50 { @apply bg-orange-900; }
+    html.dark .bg-red-50 { @apply bg-red-900; }
+    html.dark .bg-indigo-50 { @apply bg-indigo-900; }
+    html.dark .bg-cyan-50 { @apply bg-cyan-900; }
+    html.dark .bg-teal-50 { @apply bg-teal-900; }
+    html.dark .bg-rose-50 { @apply bg-rose-900; }
+    html.dark .bg-pink-50 { @apply bg-pink-900; }
+    html.dark .bg-violet-50 { @apply bg-violet-900; }
+    
+    /* Light text colors in dark backgrounds to light */
+    html.dark .text-emerald-100 { @apply text-emerald-300; }
+    html.dark .text-blue-100 { @apply text-blue-300; }
+    
+    /* Gradient backgrounds */
+    html.dark .from-slate-50 { @apply from-slate-900; }
+    html.dark .to-slate-100 { @apply to-slate-800; }
+    
+    /* Animation styles */
+    .criterion-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .criterion-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+    .star { cursor: pointer; transition: all 0.2s; }
+    .star:hover { transform: scale(1.3); }
+    .star.active { color: #f59e0b; }
+    .star.inactive { color: #d1d5db; }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .progress-ring { transition: stroke-dashoffset 0.6s ease; }
+    .modal-overlay { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+    .toast { animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes slideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 overflow-auto">
+  <div id="app" class="h-full w-full"><!-- Theme Toggle & Control Bar -->
+   <div class="fixed bottom-4 left-4 z-40 flex flex-col items-center gap-3"><button id="themeToggle" onclick="toggleTheme()" class="w-11 h-11 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center hover:scale-110 transition-all shadow-lg border-2 border-slate-200 dark:border-slate-700 hover:shadow-xl"> <i data-lucide="moon" id="themeIcon" class="w-5 h-5 text-slate-600 dark:text-amber-400"></i> </button> <button id="logoutBtnTop" onclick="logout()" class="w-11 h-11 rounded-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 flex items-center justify-center transition-all shadow-lg hidden hover:scale-110 border-2 border-red-400 dark:border-red-500"> <i data-lucide="log-out" class="w-5 h-5 text-white"></i> </button>
+   </div><!-- Role Selection Screen -->
+   <div id="roleScreen" class="h-full flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+    <div class="text-center max-w-lg w-full fade-in">
+     <div class="mb-8">
+      <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg"><i data-lucide="graduation-cap" class="w-10 h-10 text-white"></i>
+      </div>
+      <h1 id="mainTitle" class="text-4xl font-bold text-slate-800 dark:text-slate-50 mb-2">ملف الإنجاز الإلكتروني</h1>
+      <p class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-3">مجمع الصديق المتوسط</p>
+      <p class="text-slate-600 dark:text-slate-300">نظام متابعة وتقييم الأداء الوظيفي للمعلمين</p>
+     </div>
+     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><button onclick="showAdminLogin()" class="bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group"> <i data-lucide="shield" class="w-8 h-8 mx-auto mb-3 group-hover:scale-110 transition-transform"></i>
+       <div class="font-bold text-lg">
+        دخول الإدارة
+       </div>
+       <div class="text-emerald-100 text-sm mt-1">
+        إدارة المعلمين والتقييم
+       </div></button> <button onclick="showTeacherLogin()" class="bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group"> <i data-lucide="user" class="w-8 h-8 mx-auto mb-3 group-hover:scale-110 transition-transform"></i>
+       <div class="font-bold text-lg">
+        دخول المعلم
+       </div>
+       <div class="text-blue-100 text-sm mt-1">
+        رفع الملفات ومتابعة التقييم
+       </div></button>
+     </div>
+    </div>
+   </div><!-- Admin Login -->
+   <div id="adminLoginScreen" class="h-full flex items-center justify-center p-4 hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 max-w-sm w-full fade-in border border-slate-200 dark:border-slate-700"><button onclick="showRole()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 mb-4"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+     <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-50 mb-2 text-center">دخول الإدارة</h2>
+     <p class="text-slate-500 dark:text-slate-400 text-sm text-center mb-6">أدخل بيانات المسؤول</p>
+     <div class="space-y-4">
+      <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="adminUser">اسم المستخدم</label> <input id="adminUser" type="text" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" placeholder="admin">
+      </div>
+      <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="adminPass">الرقم السري</label> <input id="adminPass" type="password" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" placeholder="****">
+      </div><button onclick="loginAdmin()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg">دخول</button>
+      <p id="adminError" class="text-red-500 dark:text-red-400 text-sm text-center hidden">بيانات الدخول غير صحيحة</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500 text-center mt-4 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg">البيانات الافتراضية: <br><span class="font-mono">admin / 1234</span></p>
+     </div>
+    </div>
+   </div><!-- Teacher Login -->
+   <div id="teacherLoginScreen" class="h-full flex items-center justify-center p-4 hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 max-w-sm w-full fade-in border border-slate-200 dark:border-slate-700"><button onclick="showRole()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 mb-4"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+     <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-50 mb-2 text-center">دخول المعلم</h2>
+     <p class="text-slate-500 dark:text-slate-400 text-sm text-center mb-6">أدخل رقم السجل والرقم السري</p>
+     <div class="space-y-4">
+      <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="teacherId">رقم السجل</label> <input id="teacherId" type="text" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="رقم السجل">
+      </div>
+      <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="teacherPass">الرقم السري</label> <input id="teacherPass" type="password" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="****">
+      </div><button onclick="loginTeacher()" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg">دخول</button>
+      <p id="teacherError" class="text-red-500 dark:text-red-400 text-sm text-center hidden">بيانات الدخول غير صحيحة</p>
+     </div>
+    </div>
+   </div><!-- Admin Dashboard -->
+   <div id="adminDashboard" class="h-full overflow-auto hidden">
+    <header class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 shadow-lg sticky top-0 z-30">
+     <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center"><i data-lucide="shield" class="w-5 h-5"></i>
+       </div>
+       <h1 id="adminTitleEl" class="font-bold text-lg">لوحة تحكم الإدارة</h1>
+      </div>
+      <div class="flex items-center gap-2"><button onclick="showAdminView('teachers')" class="px-3 py-1.5 rounded-lg text-sm bg-white/20 hover:bg-white/30 transition" id="btnTeachers">المعلمين</button> <button onclick="showAdminView('reports')" class="px-3 py-1.5 rounded-lg text-sm hover:bg-white/20 transition" id="btnReports">التقارير</button> <button onclick="logout()" class="px-3 py-1.5 rounded-lg text-sm hover:bg-white/20 transition"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      </div>
+     </div>
+    </header>
+    <div class="max-w-6xl mx-auto p-4"><!-- Stats -->
+     <div id="adminStats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div><!-- Teachers View -->
+     <div id="teachersView">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+       <h2 class="text-xl font-bold text-slate-800 dark:text-slate-50">قائمة المعلمين</h2>
+       <div class="flex gap-2"><button onclick="showAddTeacher()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 shadow-md"> <i data-lucide="plus" class="w-4 h-4"></i> إضافة معلم </button> <button onclick="showEditTeachersModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 shadow-md"> <i data-lucide="edit" class="w-4 h-4"></i> تعديل معلم </button> <label class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center gap-2 cursor-pointer"> <i data-lucide="upload" class="w-4 h-4"></i> استيراد <input type="file" accept=".csv,.txt" onchange="importTeachers(event)" class="hidden"> </label>
+       </div>
+      </div>
+      <div id="teachersList" class="grid gap-3"></div>
+      <div id="noTeachers" class="text-center py-12 text-slate-400 dark:text-slate-500 hidden"><i data-lucide="users" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+       <p>لا يوجد معلمين بعد. أضف معلمين للبدء.</p>
+      </div>
+     </div><!-- Reports View -->
+     <div id="reportsView" class="hidden">
+      <h2 class="text-xl font-bold text-slate-800 dark:text-slate-50 mb-4">التقارير والإحصائيات</h2>
+      <div id="reportsContent" class="space-y-4"></div>
+     </div><!-- Teacher Criteria View (Admin) -->
+     <div id="adminCriteriaView" class="hidden"><button onclick="backToTeachers()" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4"> <i data-lucide="arrow-right" class="w-4 h-4"></i> العودة للقائمة </button>
+      <div id="adminTeacherHeader" class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm mb-4 border border-slate-200 dark:border-slate-700"></div>
+      <div id="adminCriteriaGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+     </div>
+    </div>
+   </div><!-- Teacher Dashboard -->
+   <div id="teacherDashboard" class="h-full overflow-auto hidden bg-slate-50 dark:bg-slate-950">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-800 text-white p-4 shadow-lg sticky top-0 z-30">
+     <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center"><i data-lucide="user" class="w-5 h-5"></i>
+       </div>
+       <div>
+        <h1 class="font-bold text-lg">ملف الإنجاز</h1>
+        <p id="teacherNameHeader" class="text-blue-100 text-sm"></p>
+       </div>
+      </div><button onclick="logout()" class="px-3 py-1.5 rounded-lg text-sm hover:bg-white/20 transition"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+     </div>
+    </header>
+    <div class="max-w-5xl mx-auto p-4">
+     <div id="teacherProgress" class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm mb-6 border border-slate-200 dark:border-slate-700"></div>
+     <h2 class="text-xl font-bold text-slate-800 dark:text-slate-50 mb-4">معايير الأداء الوظيفي</h2>
+     <div id="teacherCriteriaGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+    </div>
+   </div><!-- Add Teacher Modal -->
+   <div id="addTeacherModal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full fade-in border border-slate-200 dark:border-slate-700">
+     <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-slate-800 dark:text-slate-50">إضافة معلم جديد</h3><button onclick="hideModal('addTeacherModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+     </div>
+     <div class="space-y-3">
+      <div>
+       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="newName">اسم المعلم</label><input id="newName" type="text" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500 transition">
+      </div>
+      <div>
+       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="newId">رقم السجل</label><input id="newId" type="text" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500 transition">
+      </div>
+      <div>
+       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="newSpec">التخصص</label><input id="newSpec" type="text" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500 transition">
+      </div>
+      <div>
+       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="newPass">الرقم السري</label><input id="newPass" type="password" class="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500 transition">
+      </div><button onclick="addTeacher()" id="addTeacherBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow-lg">إضافة</button>
+     </div>
+    </div>
+   </div><!-- File Upload Modal -->
+   <div id="fileModal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full fade-in border border-slate-200 dark:border-slate-700">
+     <div class="flex items-center justify-between mb-4">
+      <h3 id="fileModalTitle" class="text-lg font-bold text-slate-800 dark:text-slate-50"></h3><button onclick="hideModal('fileModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+     </div>
+     <div id="fileModalContent"></div>
+    </div>
+   </div><!-- Toast -->
+   <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+    <div class="bg-slate-800 dark:bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 toast border border-slate-700 dark:border-slate-600"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i> <span id="toastMsg"></span>
+    </div>
+   </div>
+  </div>
+  <script>
+// Toggle Theme - Works immediately
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark');
+  
+  if (isDark) {
+    html.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+  }
+  
+  updateThemeIcon();
+  lucide.createIcons();
+}
+
+function updateThemeIcon() {
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  if (html.classList.contains('dark')) {
+    icon.setAttribute('data-lucide', 'sun');
+    icon.classList.remove('text-slate-600');
+    icon.classList.add('text-amber-400');
+  } else {
+    icon.setAttribute('data-lucide', 'moon');
+    icon.classList.remove('text-amber-400');
+    icon.classList.add('text-slate-600');
+  }
+}
+
+// Load saved theme immediately on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const html = document.documentElement;
+  
+  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    html.classList.add('dark');
+  } else {
+    html.classList.remove('dark');
+  }
+  
+  updateThemeIcon();
+  lucide.createIcons();
+});
+
+// Criteria definitions
+const CRITERIA = [
+  { 
+    name: 'أداء الواجبات الوظيفية', 
+    icon: 'clipboard-check', 
+    color: 'from-emerald-400 to-emerald-600',
+    description: 'تنفيذ المهام والمسؤوليات الموكلة بدقة والالتزام بالمواعيد',
+    examples: '• التحضير المسبق للدروس\n• الالتزام بالحضور والمواعيد\n• تنفيذ الخطط الدراسية'
+  },
+  { 
+    name: 'التفاعل مع المجتمع المهني', 
+    icon: 'users', 
+    color: 'from-blue-400 to-blue-600',
+    description: 'التعاون مع الزملاء والمشاركة في الأنشطة المدرسية',
+    examples: '• المشاركة في الاجتماعات والفعاليات\n• التعاون مع فريق العمل\n• تبادل الخبرات مع الزملاء'
+  },
+  { 
+    name: 'التفاعل مع أولياء الأمور', 
+    icon: 'heart-handshake', 
+    color: 'from-purple-400 to-purple-600',
+    description: 'التواصل الفعال مع أولياء الأمور حول تقدم الطلاب',
+    examples: '• الاجتماعات والاتصالات المنتظمة\n• إبلاغ عن تقدم الطلاب\n• التعاون في حل مشاكل التعلم'
+  },
+  { 
+    name: 'التنويع في أساليب التدريس', 
+    icon: 'lightbulb', 
+    color: 'from-amber-400 to-amber-600',
+    description: 'استخدام طرق تدريس متنوعة لتناسب أساليب تعلم مختلفة',
+    examples: '• استخدام الشرح والعروض العملية\n• الأنشطة التعاونية والفردية\n• توظيف مصادر تعليمية متنوعة'
+  },
+  { 
+    name: 'تحسين نتائج المتعلمين', 
+    icon: 'trending-up', 
+    color: 'from-green-400 to-green-600',
+    description: 'رفع مستوى تحصيل الطلاب وتحسين أدائهم الأكاديمي',
+    examples: '• زيادة نسب النجاح\n• تقليل الفاقد التعليمي\n• دعم الطلاب الضعفاء'
+  },
+  { 
+    name: 'إعداد وتنفيذ خطة التعلم', 
+    icon: 'book-open', 
+    color: 'from-indigo-400 to-indigo-600',
+    description: 'تصميم خطط تعليمية فعالة وتنفيذها بكفاءة',
+    examples: '• وضع أهداف تعليمية واضحة\n• توزيع المحتوى على الفترة الزمنية\n• تطبيق الخطط بمرونة'
+  },
+  { 
+    name: 'توظيف تقنيات ووسائل التعلم', 
+    icon: 'monitor', 
+    color: 'from-cyan-400 to-cyan-600',
+    description: 'استخدام التكنولوجيا والوسائل التعليمية بفعالية',
+    examples: '• استخدام السبورة الذكية\n• تطبيقات تعليمية ودعم رقمي\n• عروض توضيحية وفيديوهات تعليمية'
+  },
+  { 
+    name: 'تهيئة بيئة تعليمية', 
+    icon: 'home', 
+    color: 'from-teal-400 to-teal-600',
+    description: 'خلق بيئة تعليمية آمنة وجاذبة تشجع على التعلم',
+    examples: '• ترتيب الفصل بشكل منظم\n• توفير مناخ نفسي إيجابي\n• دعم الطلاب المحتاجين'
+  },
+  { 
+    name: 'الإدارة الصفية', 
+    icon: 'layout', 
+    color: 'from-rose-400 to-rose-600',
+    description: 'إدارة فعالة للصف والطلاب والوقت',
+    examples: '• الحفاظ على النظام والانضباط\n• إدارة الوقت بكفاءة\n• التعامل مع السلوكيات بشكل إيجابي'
+  },
+  { 
+    name: 'تحليل نتائج المتعلمين', 
+    icon: 'bar-chart-2', 
+    color: 'from-orange-400 to-orange-600',
+    description: 'تحليل الاختبارات والتقييمات وتقييم مستوى الطلاب',
+    examples: '• مراجعة نتائج الاختبارات\n• تحديد نقاط القوة والضعف\n• وضع خطط علاجية'
+  },
+  { 
+    name: 'تنويع أساليب التقويم', 
+    icon: 'check-square', 
+    color: 'from-violet-400 to-violet-600',
+    description: 'استخدام أدوات تقويم متنوعة لقياس تحصيل الطلاب',
+    examples: '• اختبارات تحريرية وشفهية\n• الملاحظة والأداء\n• التقييمات التكوينية والختامية'
+  }
+];
+
+let allData = [];
+let teachers = []; // derived from data record_type=teacher
+let records = []; // derived from data record_type=file
+let currentTeacherId = null;
+let currentRole = null;
+let selectedCriterion = null;
+
+// Default config
+const defaultConfig = {
+  page_title: 'ملف الإنجاز الإلكتروني',
+  admin_title: 'لوحة تحكم الإدارة',
+  background_color: '#f8fafc',
+  surface_color: '#ffffff',
+  text_color: '#1e293b',
+  primary_action: '#10b981',
+  secondary_action: '#6366f1'
+};
+
+// Element SDK
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => {
+    document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+    const title = document.getElementById('mainTitle');
+    if (title) title.textContent = config.page_title || defaultConfig.page_title;
+    const adminT = document.getElementById('adminTitleEl');
+    if (adminT) adminT.textContent = config.admin_title || defaultConfig.admin_title;
+  },
+  mapToCapabilities: (config) => ({
+    recolorables: [
+      { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+      { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+      { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+      { get: () => config.primary_action || defaultConfig.primary_action, set: (v) => { config.primary_action = v; window.elementSdk.setConfig({ primary_action: v }); } },
+      { get: () => config.secondary_action || defaultConfig.secondary_action, set: (v) => { config.secondary_action = v; window.elementSdk.setConfig({ secondary_action: v }); } }
+    ],
+    borderables: [],
+    fontEditable: { get: () => config.font_family || 'Tajawal', set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+    fontSizeable: { get: () => config.font_size || 16, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['page_title', config.page_title || defaultConfig.page_title],
+    ['admin_title', config.admin_title || defaultConfig.admin_title]
+  ])
+});
+
+// Data SDK
+const dataHandler = {
+  onDataChanged(data) {
+    allData = data;
+    teachers = data.filter(d => d.record_type === 'teacher');
+    records = data.filter(d => d.record_type === 'file');
+    renderCurrentView();
+  }
+};
+
+(async () => {
+  await window.dataSdk.init(dataHandler);
+})();
+
+function renderCurrentView() {
+  if (currentRole === 'admin') {
+    renderAdminStats();
+    renderTeachersList();
+    if (document.getElementById('adminCriteriaView').classList.contains('hidden') === false) {
+      renderAdminCriteria(currentTeacherId);
+    }
+    if (!document.getElementById('reportsView').classList.contains('hidden')) {
+      renderReports();
+    }
+  } else if (currentRole === 'teacher') {
+    renderTeacherView();
+  }
+}
+
+// Navigation
+function showRole() {
+  hideAll();
+  document.getElementById('roleScreen').classList.remove('hidden');
+}
+function showAdminLogin() {
+  hideAll();
+  document.getElementById('adminLoginScreen').classList.remove('hidden');
+  lucide.createIcons();
+}
+function showTeacherLogin() {
+  hideAll();
+  document.getElementById('teacherLoginScreen').classList.remove('hidden');
+  lucide.createIcons();
+}
+function hideAll() {
+  ['roleScreen','adminLoginScreen','teacherLoginScreen','adminDashboard','teacherDashboard'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById('logoutBtnTop').classList.add('hidden');
+}
+function logout() { currentRole = null; currentTeacherId = null; showRole(); }
+
+function loginAdmin() {
+  const user = document.getElementById('adminUser').value;
+  const pass = document.getElementById('adminPass').value;
+  if (user === 'admin' && pass === '1234') {
+    currentRole = 'admin';
+    hideAll();
+    document.getElementById('adminDashboard').classList.remove('hidden');
+    document.getElementById('logoutBtnTop').classList.remove('hidden');
+    renderCurrentView();
+    lucide.createIcons();
+  } else {
+    document.getElementById('adminError').classList.remove('hidden');
+  }
+}
+
+function loginTeacher() {
+  const id = document.getElementById('teacherId').value.trim();
+  const pass = document.getElementById('teacherPass').value.trim();
+  const teacher = teachers.find(t => t.teacher_id === id && t.teacher_password === pass);
+  if (teacher) {
+    currentRole = 'teacher';
+    currentTeacherId = id;
+    hideAll();
+    document.getElementById('teacherDashboard').classList.remove('hidden');
+    document.getElementById('logoutBtnTop').classList.remove('hidden');
+    document.getElementById('teacherNameHeader').textContent = teacher.teacher_name;
+    renderCurrentView();
+    lucide.createIcons();
+  } else {
+    document.getElementById('teacherError').classList.remove('hidden');
+  }
+}
+
+// Admin views
+function showAdminView(view) {
+  document.getElementById('teachersView').classList.add('hidden');
+  document.getElementById('reportsView').classList.add('hidden');
+  document.getElementById('adminCriteriaView').classList.add('hidden');
+  document.getElementById('btnTeachers').className = 'px-3 py-1.5 rounded-lg text-sm hover:bg-white/20 transition';
+  document.getElementById('btnReports').className = 'px-3 py-1.5 rounded-lg text-sm hover:bg-white/20 transition';
+  if (view === 'teachers') {
+    document.getElementById('teachersView').classList.remove('hidden');
+    document.getElementById('btnTeachers').className = 'px-3 py-1.5 rounded-lg text-sm bg-white/20 hover:bg-white/30 transition';
+  } else {
+    document.getElementById('reportsView').classList.remove('hidden');
+    document.getElementById('btnReports').className = 'px-3 py-1.5 rounded-lg text-sm bg-white/20 hover:bg-white/30 transition';
+    renderReports();
+  }
+}
+
+function renderAdminStats() {
+  const avgRating = records.length ? (records.reduce((s, r) => s + (r.rating || 0), 0) / records.filter(r => r.rating > 0).length || 0).toFixed(1) : '0';
+  const filesCount = records.filter(r => r.file_name).length;
+  const rated = records.filter(r => r.rating > 0).length;
+  document.getElementById('adminStats').innerHTML = `
+    <div class="bg-white rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-emerald-600">${teachers.length}</div><div class="text-slate-500 text-sm">المعلمين</div></div>
+    <div class="bg-white rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-blue-600">${filesCount}</div><div class="text-slate-500 text-sm">الملفات المرفوعة</div></div>
+    <div class="bg-white rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-amber-600">${avgRating}</div><div class="text-slate-500 text-sm">متوسط التقييم</div></div>
+    <div class="bg-white rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-purple-600">${rated}</div><div class="text-slate-500 text-sm">تم تقييمها</div></div>
+  `;
+  lucide.createIcons();
+}
+
+function renderTeachersList() {
+  const list = document.getElementById('teachersList');
+  const noT = document.getElementById('noTeachers');
+  if (teachers.length === 0) { list.innerHTML = ''; noT.classList.remove('hidden'); return; }
+  noT.classList.add('hidden');
+  list.innerHTML = teachers.map(t => {
+    const tRecords = records.filter(r => r.teacher_id === t.teacher_id);
+    const rated = tRecords.filter(r => r.rating > 0).length;
+    const files = tRecords.filter(r => r.file_name).length;
+    const avg = rated ? (tRecords.reduce((s, r) => s + (r.rating || 0), 0) / rated).toFixed(1) : '-';
+    const avgColor = avg === '-' ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400' : avg >= 4 ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : avg >= 3 ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
+    return `<div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm flex items-center justify-between hover:shadow-md transition border border-slate-200 dark:border-slate-700">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900 dark:to-teal-900 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-300 font-bold">${t.teacher_name?.charAt(0) || '؟'}</div>
+        <div><div class="font-bold text-slate-800 dark:text-slate-100">${t.teacher_name}</div><div class="text-sm text-slate-500 dark:text-slate-400">${t.specialization || ''} • ${t.teacher_id}</div></div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-center">
+          <div class="text-sm font-bold ${avgColor} px-3 py-1 rounded-lg">${avg}</div>
+          <div class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">التقييم</div>
+        </div>
+        <div class="text-center"><div class="text-sm font-bold text-blue-600 dark:text-blue-400">${files}/11</div><div class="text-xs text-slate-400 dark:text-slate-500">الملفات</div></div>
+        <button onclick="viewTeacherCriteria('${t.teacher_id}')" class="bg-emerald-50 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-800 transition">متابعة</button>
+        <button onclick="editTeacher('${t.__backendId}')" class="text-blue-400 dark:text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition"><i data-lucide="edit" class="w-4 h-4"></i></button>
+        <button onclick="deleteTeacher('${t.__backendId}')" class="text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function viewTeacherCriteria(teacherId) {
+  currentTeacherId = teacherId;
+  document.getElementById('teachersView').classList.add('hidden');
+  document.getElementById('adminCriteriaView').classList.remove('hidden');
+  renderAdminCriteria(teacherId);
+}
+
+function backToTeachers() {
+  document.getElementById('adminCriteriaView').classList.add('hidden');
+  document.getElementById('teachersView').classList.remove('hidden');
+}
+
+function renderAdminCriteria(teacherId) {
+  const teacher = teachers.find(t => t.teacher_id === teacherId);
+  if (!teacher) return;
+  const tRecords = records.filter(r => r.teacher_id === teacherId);
+
+  document.getElementById('adminTeacherHeader').innerHTML = `
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold">${teacher.teacher_name?.charAt(0)}</div>
+      <div><h3 class="text-xl font-bold text-slate-800">${teacher.teacher_name}</h3><p class="text-slate-500">${teacher.specialization} • ${teacher.teacher_id}</p></div>
+    </div>`;
+
+  document.getElementById('adminCriteriaGrid').innerHTML = CRITERIA.map((c, i) => {
+    const rec = tRecords.find(r => r.criterion_index === i);
+    const hasFile = rec && rec.file_name;
+    const rating = rec ? rec.rating || 0 : 0;
+    
+    const getRatingColor = (r) => {
+      if (r === 1) return 'bg-red-100 text-red-600 border-red-300';
+      if (r === 2) return 'bg-orange-100 text-orange-600 border-orange-300';
+      if (r === 3) return 'bg-amber-100 text-amber-600 border-amber-300';
+      if (r === 4) return 'bg-lime-100 text-lime-600 border-lime-300';
+      if (r === 5) return 'bg-green-100 text-green-600 border-green-300';
+      return 'bg-slate-100 text-slate-400';
+    };
+
+    const getRatingLabel = (r) => {
+      if (r === 1) return 'غير مرضي';
+      if (r === 2) return 'ضعيف';
+      if (r === 3) return 'متوسط';
+      if (r === 4) return 'جيد';
+      if (r === 5) return 'ممتاز';
+      return 'لم يقيم';
+    };
+
+    return `<div class="criterion-card bg-white rounded-2xl p-4 shadow-sm text-center cursor-pointer border-2 border-transparent hover:border-slate-200" onclick="openAdminRating('${teacherId}', ${i})">
+      <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br ${c.color} rounded-xl flex items-center justify-center text-white shadow-md">
+        <i data-lucide="${c.icon}" class="w-6 h-6"></i>
+      </div>
+      <div class="text-xs font-medium text-slate-700 mb-2 leading-tight">${c.name}</div>
+      ${rating > 0 ? `<div class="inline-block ${getRatingColor(rating)} px-2 py-1 rounded-lg border text-xs font-bold mb-1">${rating}</div>` : '<div class="text-xs text-slate-300 mb-1">-</div>'}
+      <div class="text-xs ${hasFile ? 'text-emerald-500' : 'text-slate-400'}">${hasFile ? '✓ مرفق' : 'بدون ملف'}</div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function openAdminRating(teacherId, criterionIdx) {
+  selectedCriterion = { teacherId, criterionIdx };
+  const rec = records.find(r => r.teacher_id === teacherId && r.criterion_index === criterionIdx);
+  const rating = rec ? rec.rating || 0 : 0;
+  const c = CRITERIA[criterionIdx];
+
+  const getRatingColor = (r) => {
+    if (r === 1) return 'from-red-500 to-red-600';
+    if (r === 2) return 'from-orange-500 to-orange-600';
+    if (r === 3) return 'from-amber-500 to-amber-600';
+    if (r === 4) return 'from-lime-500 to-lime-600';
+    if (r === 5) return 'from-green-500 to-green-600';
+    return 'from-slate-300 to-slate-400';
+  };
+
+  const getRatingText = (r) => {
+    if (r === 1) return 'غير مرضي';
+    if (r === 2) return 'ضعيف';
+    if (r === 3) return 'متوسط';
+    if (r === 4) return 'جيد';
+    if (r === 5) return 'ممتاز';
+    return 'لم يتم التقييم';
+  };
+
+  let filePreviewHtml = '';
+  if (rec && rec.file_name) {
+    const ext = rec.file_name.split('.').pop()?.toLowerCase() || '';
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'].includes(ext)) {
+      filePreviewHtml = `
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-3 mb-3">
+            <i data-lucide="file" class="w-8 h-8 text-blue-500"></i>
+            <div class="flex-1">
+              <p class="font-medium text-slate-800">${rec.file_name}</p>
+              <p class="text-xs text-slate-400">ملف مرفوع من المعلم</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <a href="#" onclick="downloadFile('${rec.file_name}'); return false;" class="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition flex items-center justify-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i> تحميل
+            </a>
+            <button onclick="viewFilePreview('${rec.file_name}')" class="bg-slate-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-600 transition flex items-center justify-center gap-2">
+              <i data-lucide="eye" class="w-4 h-4"></i> عرض
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      filePreviewHtml = `
+        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-2 text-emerald-700">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span class="font-medium">${rec.file_name}</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById('fileModalTitle').textContent = `${c.name}`;
+  document.getElementById('fileModalContent').innerHTML = `
+    <div class="text-center mb-4">
+      <div class="w-16 h-16 mx-auto mb-3 bg-gradient-to-br ${c.color} rounded-2xl flex items-center justify-center text-white"><i data-lucide="${c.icon}" class="w-8 h-8"></i></div>
+    </div>
+    ${filePreviewHtml}
+    <div class="bg-slate-50 rounded-xl p-4 mb-4">
+      <p class="text-sm font-medium text-slate-700 mb-3">التقييم من 5</p>
+      <div class="flex justify-center gap-2">${[1,2,3,4,5].map(s => `<button onclick="setRating(${s})" class="rating-btn w-12 h-12 rounded-lg font-bold text-white transition-all ${s === rating ? 'bg-gradient-to-br ' + getRatingColor(s) + ' ring-2 ring-offset-2' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}" id="ratingBtn${s}">${s}</button>`).join('')}</div>
+      ${rating > 0 ? `<p class="text-sm mt-3 font-medium text-center ${rating === 1 ? 'text-red-600' : rating === 2 ? 'text-orange-600' : rating === 3 ? 'text-amber-600' : rating === 4 ? 'text-lime-600' : 'text-green-600'}">${getRatingText(rating)}</p>` : ''}
+    </div>
+    <button onclick="saveRating()" id="saveRatingBtn" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-xl hover:bg-emerald-600 transition">حفظ التقييم</button>
+  `;
+  document.getElementById('fileModal').classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function viewFilePreview(fileName) {
+  showToast('تم فتح الملف بنجاح');
+}
+
+function downloadFile(fileName) {
+  showToast('جاري تحميل الملف...');
+}
+
+function setRating(val) {
+  pendingRating = val;
+  const getRatingColor = (r) => {
+    if (r === 1) return 'from-red-500 to-red-600';
+    if (r === 2) return 'from-orange-500 to-orange-600';
+    if (r === 3) return 'from-amber-500 to-amber-600';
+    if (r === 4) return 'from-lime-500 to-lime-600';
+    if (r === 5) return 'from-green-500 to-green-600';
+    return 'from-slate-300 to-slate-400';
+  };
+
+  const getRatingText = (r) => {
+    if (r === 1) return 'غير مرضي';
+    if (r === 2) return 'ضعيف';
+    if (r === 3) return 'متوسط';
+    if (r === 4) return 'جيد';
+    if (r === 5) return 'ممتاز';
+    return 'لم يتم التقييم';
+  };
+
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('ratingBtn' + i);
+    if (el) {
+      if (i === val) {
+        el.className = 'rating-btn w-12 h-12 rounded-lg font-bold text-white transition-all bg-gradient-to-br ' + getRatingColor(val) + ' ring-2 ring-offset-2';
+      } else {
+        el.className = 'rating-btn w-12 h-12 rounded-lg font-bold bg-slate-200 text-slate-600 hover:bg-slate-300 transition-all';
+      }
+    }
+  }
+
+  const textEl = document.querySelector('[id^="ratingBtn"]')?.parentElement?.nextElementSibling;
+  if (textEl) {
+    const colorClass = val === 1 ? 'text-red-600' : val === 2 ? 'text-orange-600' : val === 3 ? 'text-amber-600' : val === 4 ? 'text-lime-600' : 'text-green-600';
+    textEl.innerHTML = `<p class="text-sm mt-3 font-medium ${colorClass}">${getRatingText(val)}</p>`;
+  }
+}
+
+let pendingRating = 0;
+async function saveRating() {
+  if (!selectedCriterion || pendingRating === 0) return;
+  const btn = document.getElementById('saveRatingBtn');
+  btn.textContent = 'جاري الحفظ...'; btn.disabled = true;
+
+  const { teacherId, criterionIdx } = selectedCriterion;
+  const existing = allData.find(d => d.record_type === 'file' && d.teacher_id === teacherId && d.criterion_index === criterionIdx);
+
+  let result;
+  if (existing) {
+    result = await window.dataSdk.update({ ...existing, rating: pendingRating });
+  } else {
+    result = await window.dataSdk.create({ 
+      record_type: 'file', 
+      teacher_id: teacherId, 
+      teacher_name: '', 
+      specialization: '', 
+      criterion_index: criterionIdx, 
+      file_name: '', 
+      rating: pendingRating, 
+      teacher_password: '',
+      created_at: new Date().toISOString() 
+    });
+  }
+
+  btn.textContent = 'حفظ التقييم'; btn.disabled = false;
+  if (result.isOk) { showToast('تم حفظ التقييم'); hideModal('fileModal'); }
+  else { showToast('حدث خطأ'); }
+}
+
+// Teacher view
+function renderTeacherView() {
+  const tRecords = records.filter(r => r.teacher_id === currentTeacherId);
+  const filesCount = tRecords.filter(r => r.file_name).length;
+  const ratedCount = tRecords.filter(r => r.rating > 0).length;
+  const avg = ratedCount ? (tRecords.reduce((s, r) => s + (r.rating || 0), 0) / ratedCount).toFixed(1) : '0';
+  const pct = Math.round((filesCount / 11) * 100);
+
+  const getRatingBgColor = (avg) => {
+    if (avg >= 4.5) return 'from-green-50 dark:from-green-900 to-emerald-50 dark:to-emerald-900';
+    if (avg >= 3.5) return 'from-lime-50 dark:from-lime-900 to-green-50 dark:to-green-900';
+    if (avg >= 2.5) return 'from-amber-50 dark:from-amber-900 to-yellow-50 dark:to-yellow-900';
+    if (avg >= 1.5) return 'from-orange-50 dark:from-orange-900 to-red-50 dark:to-red-900';
+    return 'from-red-50 dark:from-red-900 to-rose-50 dark:to-rose-900';
+  };
+
+  const getRatingTextColor = (avg) => {
+    if (avg >= 4.5) return 'text-green-600 dark:text-green-300';
+    if (avg >= 3.5) return 'text-lime-600 dark:text-lime-300';
+    if (avg >= 2.5) return 'text-amber-600 dark:text-amber-300';
+    if (avg >= 1.5) return 'text-orange-600 dark:text-orange-300';
+    return 'text-red-600 dark:text-red-300';
+  };
+
+  const numAvg = parseFloat(avg);
+
+  document.getElementById('teacherProgress').innerHTML = `
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+      <div><h3 class="font-bold text-slate-800 dark:text-slate-50 text-lg">نسبة الإنجاز</h3><p class="text-sm text-slate-500 dark:text-slate-400">${filesCount} من 11 معيار مكتمل</p></div>
+      <div class="flex items-center gap-6">
+        <div class="text-center">
+          <div class="bg-gradient-to-br ${getRatingBgColor(numAvg)} px-6 py-4 rounded-xl">
+            <div class="text-3xl font-bold ${getRatingTextColor(numAvg)}">${avg}</div>
+            <div class="text-xs text-slate-600 dark:text-slate-400 mt-1">متوسط التقييم</div>
+          </div>
+        </div>
+        <div class="relative w-20 h-20">
+          <svg class="w-20 h-20 -rotate-90"><circle cx="40" cy="40" r="36" fill="none" stroke="#e2e8f0" class="dark:stroke-slate-700" stroke-width="4"/><circle cx="40" cy="40" r="36" fill="none" stroke="#10b981" stroke-width="4" stroke-dasharray="${226.19}" stroke-dashoffset="${226.19 - (226.19 * pct / 100)}" stroke-linecap="round" class="progress-ring"/></svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div>
+              <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400">${pct}%</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400">إنجاز</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Teacher Report Section -->
+    <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+      <h4 class="font-bold text-slate-800 dark:text-slate-50 mb-4">تقرير التقييم</h4>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 text-center border border-slate-200 dark:border-slate-700">
+          <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${filesCount}</div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 mt-1">ملفات مرفوعة</div>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 text-center border border-slate-200 dark:border-slate-700">
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${ratedCount}</div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 mt-1">معايير مقيّمة</div>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 text-center border border-slate-200 dark:border-slate-700">
+          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">${11 - filesCount}</div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 mt-1">متبقية</div>
+        </div>
+        <div class="bg-gradient-to-br ${getRatingBgColor(numAvg)} rounded-lg p-3 text-center border border-slate-200 dark:border-slate-700">
+          <div class="text-2xl font-bold ${getRatingTextColor(numAvg)}">${avg}/5</div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 mt-1">التقييم النهائي</div>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('teacherCriteriaGrid').innerHTML = CRITERIA.map((c, i) => {
+    const rec = tRecords.find(r => r.criterion_index === i);
+    const hasFile = rec && rec.file_name;
+    const rating = rec ? rec.rating || 0 : 0;
+
+    const getRatingColor = (r) => {
+      if (r === 1) return 'from-red-500 to-red-600';
+      if (r === 2) return 'from-orange-500 to-orange-600';
+      if (r === 3) return 'from-amber-500 to-amber-600';
+      if (r === 4) return 'from-lime-500 to-lime-600';
+      if (r === 5) return 'from-green-500 to-green-600';
+      return 'from-slate-300 dark:from-slate-600 to-slate-400 dark:to-slate-700';
+    };
+
+    const getRatingLabel = (r) => {
+      if (r === 1) return 'غير مرضي';
+      if (r === 2) return 'ضعيف';
+      if (r === 3) return 'متوسط';
+      if (r === 4) return 'جيد';
+      if (r === 5) return 'ممتاز';
+      return '-';
+    };
+
+    return `<div class="criterion-card bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm text-center cursor-pointer hover:shadow-md transition border border-slate-200 dark:border-slate-700" onclick="openTeacherCriterion(${i})">
+      <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br ${c.color} rounded-xl flex items-center justify-center text-white shadow-md">
+        <i data-lucide="${c.icon}" class="w-6 h-6"></i>
+      </div>
+      <div class="text-xs font-medium text-slate-700 dark:text-slate-300 mb-2 leading-tight">${c.name}</div>
+      ${rating > 0 ? `<div class="inline-block bg-gradient-to-r ${getRatingColor(rating)} text-white px-2 py-1 rounded-lg text-xs font-bold mb-1">${getRatingLabel(rating)}</div>` : '<div class="text-xs text-slate-400 dark:text-slate-500 mb-1">بدون تقييم</div>'}
+      <div class="text-xs ${hasFile ? 'text-emerald-500 dark:text-emerald-400 font-medium' : 'text-blue-400 dark:text-blue-500'}">${hasFile ? '✓ تم الرفع' : 'اضغط للرفع'}</div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function openTeacherCriterion(idx) {
+  const c = CRITERIA[idx];
+  const rec = records.find(r => r.teacher_id === currentTeacherId && r.criterion_index === idx);
+  const rating = rec ? rec.rating || 0 : 0;
+
+  const getRatingColor = (r) => {
+    if (r === 1) return 'from-red-500 to-red-600';
+    if (r === 2) return 'from-orange-500 to-orange-600';
+    if (r === 3) return 'from-amber-500 to-amber-600';
+    if (r === 4) return 'from-lime-500 to-lime-600';
+    if (r === 5) return 'from-green-500 to-green-600';
+    return 'from-slate-300 to-slate-400';
+  };
+
+  const getRatingLabel = (r) => {
+    if (r === 1) return 'غير مرضي';
+    if (r === 2) return 'ضعيف';
+    if (r === 3) return 'متوسط';
+    if (r === 4) return 'جيد';
+    if (r === 5) return 'ممتاز';
+    return 'لم يتم التقييم';
+  };
+
+  document.getElementById('fileModalTitle').textContent = c.name;
+  document.getElementById('fileModalContent').innerHTML = `
+    <div class="text-center mb-4">
+      <div class="w-16 h-16 mx-auto mb-3 bg-gradient-to-br ${c.color} rounded-2xl flex items-center justify-center text-white"><i data-lucide="${c.icon}" class="w-8 h-8"></i></div>
+      ${rating > 0 ? `<p class="text-sm text-slate-600 mb-2">تقييم الإدارة</p><div class="inline-block bg-gradient-to-r ${getRatingColor(rating)} text-white px-4 py-2 rounded-lg text-sm font-bold">${getRatingLabel(rating)} (${rating}/5)</div>` : '<p class="text-sm text-slate-400">لم يتم التقييم بعد</p>'}
+    </div>
+    <div class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center mb-4">
+      ${rec && rec.file_name ? `<p class="text-emerald-600 font-medium">✓ ${rec.file_name}</p><p class="text-xs text-slate-400 mt-1">يمكنك رفع ملف جديد للاستبدال</p>` : '<p class="text-slate-400 mb-2">اسحب الملف هنا أو</p>'}
+      <label class="inline-block mt-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
+        اختر ملف <input type="file" class="hidden" onchange="uploadFile(event, ${idx})">
+      </label>
+    </div>
+  `;
+  document.getElementById('fileModal').classList.remove('hidden');
+  lucide.createIcons();
+}
+
+async function uploadFile(event, idx) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const fileName = file.name;
+  const existing = allData.find(d => d.record_type === 'file' && d.teacher_id === currentTeacherId && d.criterion_index === idx);
+
+  let result;
+  if (existing) {
+    result = await window.dataSdk.update({ ...existing, file_name: fileName, created_at: new Date().toISOString() });
+  } else {
+    if (allData.length >= 999) { showToast('تم الوصول للحد الأقصى'); return; }
+    result = await window.dataSdk.create({ 
+      record_type: 'file', 
+      teacher_id: currentTeacherId, 
+      teacher_name: '', 
+      specialization: '', 
+      criterion_index: idx, 
+      file_name: fileName, 
+      rating: 0, 
+      teacher_password: '',
+      created_at: new Date().toISOString() 
+    });
+  }
+
+  if (result.isOk) { showToast('تم رفع الملف بنجاح'); hideModal('fileModal'); }
+  else { showToast('حدث خطأ'); }
+}
+
+// Add teacher
+function showAddTeacher() { document.getElementById('addTeacherModal').classList.remove('hidden'); }
+
+let editingTeacherId = null;
+
+function editTeacher(backendId) {
+  const teacher = allData.find(d => d.__backendId === backendId);
+  if (!teacher) return;
+  editingTeacherId = backendId;
+  
+  // Populate dropdown
+  const select = document.getElementById('selectTeacherEdit');
+  select.innerHTML = '<option value="">اختر معلماً</option>';
+  teachers.forEach(t => {
+    select.innerHTML += `<option value="${t.__backendId}">${t.teacher_name}</option>`;
+  });
+  select.value = backendId;
+  
+  loadTeacherData();
+  document.getElementById('editTeacherModal').classList.remove('hidden');
+}
+
+function showEditTeachersModal() {
+  editingTeacherId = null;
+  const select = document.getElementById('selectTeacherEdit');
+  select.innerHTML = '<option value="">اختر معلماً</option>';
+  teachers.forEach(t => {
+    select.innerHTML += `<option value="${t.__backendId}">${t.teacher_name}</option>`;
+  });
+  select.value = '';
+  document.getElementById('editName').value = '';
+  document.getElementById('editSpec').value = '';
+  document.getElementById('editPass').value = '';
+  document.getElementById('editTeacherModal').classList.remove('hidden');
+}
+
+function loadTeacherData() {
+  const select = document.getElementById('selectTeacherEdit');
+  const selectedId = select.value;
+  if (!selectedId) {
+    document.getElementById('editName').value = '';
+    document.getElementById('editSpec').value = '';
+    document.getElementById('editPass').value = '';
+    return;
+  }
+  
+  const teacher = allData.find(d => d.__backendId === selectedId);
+  if (teacher) {
+    editingTeacherId = selectedId;
+    document.getElementById('editName').value = teacher.teacher_name;
+    document.getElementById('editSpec').value = teacher.specialization;
+    document.getElementById('editPass').value = teacher.teacher_password;
+  }
+}
+
+async function saveTeacherEdit() {
+  if (!editingTeacherId) { showToast('اختر معلماً أولاً'); return; }
+  
+  const teacher = allData.find(d => d.__backendId === editingTeacherId);
+  if (!teacher) return;
+  
+  const btn = document.getElementById('saveTeacherEditBtn');
+  btn.textContent = 'جاري الحفظ...'; btn.disabled = true;
+
+  const result = await window.dataSdk.update({ 
+    ...teacher, 
+    teacher_name: document.getElementById('editName').value,
+    specialization: document.getElementById('editSpec').value,
+    teacher_password: document.getElementById('editPass').value
+  });
+
+  btn.textContent = 'حفظ التعديلات'; btn.disabled = false;
+  if (result.isOk) {
+    showToast('تم حفظ التعديلات');
+    hideModal('editTeacherModal');
+  } else {
+    showToast('حدث خطأ');
+  }
+}
+
+async function deleteSelectedTeacher() {
+  if (!editingTeacherId) { showToast('اختر معلماً أولاً'); return; }
+  
+  const teacher = allData.find(d => d.__backendId === editingTeacherId);
+  if (!teacher) return;
+  
+  const btn = document.getElementById('deleteTeacherBtn');
+  btn.textContent = 'جاري الحذف...'; btn.disabled = true;
+
+  const result = await window.dataSdk.delete(teacher);
+  
+  btn.textContent = 'حذف المعلم'; btn.disabled = false;
+  if (result.isOk) {
+    showToast('تم حذف المعلم');
+    hideModal('editTeacherModal');
+  } else {
+    showToast('حدث خطأ');
+  }
+}
+
+async function addTeacher() {
+  const name = document.getElementById('newName').value.trim();
+  const id = document.getElementById('newId').value.trim();
+  const spec = document.getElementById('newSpec').value.trim();
+  const pass = document.getElementById('newPass').value.trim();
+  if (!name || !id || !pass) return;
+  if (allData.length >= 999) { showToast('تم الوصول للحد الأقصى'); return; }
+
+  const btn = document.getElementById('addTeacherBtn');
+  btn.textContent = 'جاري الإضافة...'; btn.disabled = true;
+
+  const result = await window.dataSdk.create({ 
+    record_type: 'teacher', 
+    teacher_name: name, 
+    teacher_id: id, 
+    specialization: spec, 
+    teacher_password: pass,
+    criterion_index: -1, 
+    file_name: '', 
+    rating: 0, 
+    created_at: new Date().toISOString() 
+  });
+
+  btn.textContent = 'إضافة'; btn.disabled = false;
+  if (result.isOk) {
+    showToast('تم إضافة المعلم');
+    hideModal('addTeacherModal');
+    document.getElementById('newName').value = '';
+    document.getElementById('newId').value = '';
+    document.getElementById('newSpec').value = '';
+    document.getElementById('newPass').value = '';
+  }
+}
+
+async function deleteTeacher(backendId) {
+  const rec = allData.find(d => d.__backendId === backendId);
+  if (!rec) return;
+  const result = await window.dataSdk.delete(rec);
+  if (result.isOk) showToast('تم حذف المعلم');
+}
+
+function importTeachers(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const text = e.target.result;
+    const lines = text.split('\n').filter(l => l.trim());
+    for (let i = 1; i < lines.length && i < 50; i++) {
+      const parts = lines[i].split(/[,\t]/);
+      if (parts.length >= 4) {
+        if (allData.length >= 999) { showToast('تم الوصول للحد الأقصى'); break; }
+        await window.dataSdk.create({ 
+          record_type: 'teacher', 
+          teacher_name: parts[0].trim(), 
+          teacher_id: parts[1].trim(), 
+          specialization: parts[2].trim(), 
+          teacher_password: parts[3].trim(),
+          criterion_index: -1, 
+          file_name: '', 
+          rating: 0, 
+          created_at: new Date().toISOString() 
+        });
+      }
+    }
+    showToast('تم استيراد المعلمين');
+  };
+  reader.readAsText(file);
+}
+
+// Reports
+function renderReports() {
+  const container = document.getElementById('reportsContent');
+  if (teachers.length === 0) { container.innerHTML = '<p class="text-center text-slate-400 py-8">لا توجد بيانات كافية لعرض التقارير</p>'; return; }
+
+  // Stats Cards
+  const allRated = records.filter(r => r.rating > 0);
+  const overallAvg = allRated.length ? (allRated.reduce((s, r) => s + r.rating, 0) / allRated.length).toFixed(1) : '0';
+  const filesUploaded = records.filter(r => r.file_name).length;
+  const excellentTeachers = teachers.filter(t => {
+    const tRecs = records.filter(r => r.teacher_id === t.teacher_id && r.rating > 0);
+    return tRecs.length > 0 && (tRecs.reduce((s, r) => s + r.rating, 0) / tRecs.length) >= 4.5;
+  }).length;
+
+  let html = `
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-l-4 border-emerald-500 rounded-xl p-4 shadow-sm">
+        <div class="text-3xl font-bold text-emerald-600 mb-1">${overallAvg}</div>
+        <div class="text-xs text-slate-600">متوسط التقييم</div>
+      </div>
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-xl p-4 shadow-sm">
+        <div class="text-3xl font-bold text-blue-600 mb-1">${filesUploaded}</div>
+        <div class="text-xs text-slate-600">ملفات مرفوعة</div>
+      </div>
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 border-l-4 border-purple-500 rounded-xl p-4 shadow-sm">
+        <div class="text-3xl font-bold text-purple-600 mb-1">${teachers.length}</div>
+        <div class="text-xs text-slate-600">عدد المعلمين</div>
+      </div>
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-l-4 border-amber-500 rounded-xl p-4 shadow-sm">
+        <div class="text-3xl font-bold text-amber-600 mb-1">${excellentTeachers}</div>
+        <div class="text-xs text-slate-600">معلمين ممتازين</div>
+      </div>
+    </div>
+  `;
+
+  // Criteria Overview
+  html += '<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">';
+  
+  const criteriaAvgs = CRITERIA.map((c, i) => {
+    const cRecords = records.filter(r => r.criterion_index === i && r.rating > 0);
+    const avg = cRecords.length ? (cRecords.reduce((s, r) => s + r.rating, 0) / cRecords.length) : 0;
+    return { name: c.name, icon: c.icon, color: c.color, avg, count: cRecords.length, idx: i + 1 };
+  }).sort((a, b) => b.avg - a.avg);
+
+  // Top performers
+  html += '<div class="bg-white rounded-xl shadow-sm p-5 border-t-4 border-emerald-500">';
+  html += '<h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="trophy" class="w-5 h-5 text-emerald-600"></i>أفضل المعايير</h3>';
+  html += '<div class="space-y-2">';
+  criteriaAvgs.slice(0, 3).forEach(c => {
+    html += `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-gradient-to-br ${c.color} rounded-lg flex items-center justify-center text-white text-xs"><i data-lucide="${c.icon}" class="w-3 h-3"></i></div>
+          <span class="text-xs font-medium text-slate-700">${c.idx}. ${c.name.substring(0, 15)}</span>
+        </div>
+        <span class="text-sm font-bold text-emerald-600">${c.avg.toFixed(1)}/5</span>
+      </div>
+    `;
+  });
+  html += '</div></div>';
+
+  // Low performers
+  html += '<div class="bg-white rounded-xl shadow-sm p-5 border-t-4 border-orange-500">';
+  html += '<h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="alert-circle" class="w-5 h-5 text-orange-600"></i>بحاجة لتحسين</h3>';
+  html += '<div class="space-y-2">';
+  criteriaAvgs.reverse().slice(0, 3).forEach(c => {
+    html += `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-gradient-to-br ${c.color} rounded-lg flex items-center justify-center text-white text-xs"><i data-lucide="${c.icon}" class="w-3 h-3"></i></div>
+          <span class="text-xs font-medium text-slate-700">${c.idx}. ${c.name.substring(0, 15)}</span>
+        </div>
+        <span class="text-sm font-bold ${c.avg === 0 ? 'text-slate-400' : 'text-orange-600'}">${c.avg === 0 ? 'لم يقيم' : c.avg.toFixed(1) + '/5'}</span>
+      </div>
+    `;
+  });
+  html += '</div></div>';
+
+  // Teachers ranking
+  const teacherStats = teachers.map(t => {
+    const tRecs = records.filter(r => r.teacher_id === t.teacher_id && r.rating > 0);
+    const avg = tRecs.length ? (tRecs.reduce((s, r) => s + r.rating, 0) / tRecs.length) : 0;
+    return { teacher: t, avg, ratedCount: tRecs.length };
+  }).sort((a, b) => b.avg - a.avg);
+
+  html += '<div class="bg-white rounded-xl shadow-sm p-5 border-t-4 border-indigo-500">';
+  html += '<h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-indigo-600"></i>ترتيب المعلمين</h3>';
+  html += '<div class="space-y-2">';
+  teacherStats.slice(0, 5).forEach((ts, idx) => {
+    const medals = ['🥇', '🥈', '🥉'];
+    const medal = idx < 3 ? medals[idx] : '';
+    const getRatingBg = (r) => r >= 4.5 ? 'bg-green-50 text-green-700' : r >= 3.5 ? 'bg-emerald-50 text-emerald-700' : r >= 2.5 ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-700';
+    html += `
+      <div class="flex items-center justify-between p-2 ${getRatingBg(ts.avg)} rounded-lg">
+        <span class="text-sm font-medium">${medal} ${ts.teacher.teacher_name}</span>
+        <span class="text-xs font-bold">${ts.avg > 0 ? ts.avg.toFixed(1) : '-'}/5</span>
+      </div>
+    `;
+  });
+  html += '</div></div>';
+  html += '</div>';
+
+  // Criteria detail cards - simplified and concise
+  html += '<div class="mb-6"><h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="list" class="w-5 h-5 text-indigo-600"></i>ملخص المعايير والتقييمات</h3>';
+  html += '<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">';
+
+  CRITERIA.forEach((c, i) => {
+    const cRecords = records.filter(r => r.criterion_index === i && r.rating > 0);
+    const avg = cRecords.length ? (cRecords.reduce((s, r) => s + r.rating, 0) / cRecords.length) : 0;
+    const pct = (avg / 5) * 100;
+
+    const getRatingBg = (r) => {
+      if (r >= 4.5) return 'from-green-400 to-emerald-500';
+      if (r >= 3.5) return 'from-lime-400 to-green-500';
+      if (r >= 2.5) return 'from-amber-400 to-yellow-500';
+      if (r >= 1.5) return 'from-orange-400 to-red-500';
+      return 'from-slate-300 to-slate-400';
+    };
+
+    const getRatingLabel = (r) => {
+      if (r >= 4.5) return 'ممتاز ⭐';
+      if (r >= 3.5) return 'جيد ✓';
+      if (r >= 2.5) return 'متوسط ○';
+      if (r >= 1.5) return 'ضعيف ✗';
+      return 'بدون تقييم';
+    };
+
+    html += `
+      <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-slate-200 hover:shadow-md transition">
+        <div class="flex items-start justify-between mb-2">
+          <div class="flex items-start gap-3 flex-1">
+            <div class="w-10 h-10 bg-gradient-to-br ${c.color} rounded-lg flex items-center justify-center text-white flex-shrink-0">
+              <i data-lucide="${c.icon}" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-slate-800 text-sm">${i + 1}. ${c.name}</h4>
+              <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">${c.description}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div class="flex-1">
+            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r ${getRatingBg(avg)} rounded-full transition-all" style="width:${pct}%"></div>
+            </div>
+          </div>
+          <div class="text-right ml-3">
+            <div class="text-sm font-bold text-slate-800">${avg > 0 ? avg.toFixed(1) : '-'}</div>
+            <div class="text-xs text-slate-400">${cRecords.length} تقييم</div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div></div>';
+
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+// Utils
+function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9fdfebf890eccdf8',t:'MTc3OTE2MDM2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
